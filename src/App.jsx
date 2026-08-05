@@ -9,10 +9,14 @@ import {
   BarChart,
   Bar,
   Rectangle,
+  ComposedChart,
+  Line,
+  ReferenceLine,
   XAxis,
   YAxis,
   CartesianGrid,
   LabelList,
+  Legend,
 } from "recharts";
 import {
   Ship,
@@ -56,6 +60,7 @@ const vessels = [
     estStock: 10021247,
     estTransit: 15684236,
     estProfitIncl: 31661124,
+    currentPeriodProfit: 16023979,
   },
   {
     name: "MFa-1",
@@ -69,6 +74,7 @@ const vessels = [
     estStock: 0,
     estTransit: 9326488,
     estProfitIncl: 14137889,
+    currentPeriodProfit: 364118,
   },
   {
     name: "MFa-168",
@@ -82,6 +88,7 @@ const vessels = [
     estStock: 11934493,
     estTransit: 13246675,
     estProfitIncl: 38111863,
+    currentPeriodProfit: 13537836,
   },
   {
     name: "MFu-188",
@@ -95,6 +102,7 @@ const vessels = [
     estStock: 11869793,
     estTransit: 11430096,
     estProfitIncl: 28231652,
+    currentPeriodProfit: 11646042,
   },
   {
     name: "宏洋輪",
@@ -108,6 +116,7 @@ const vessels = [
     estStock: 9795461,
     estTransit: 1590646,
     estProfitIncl: 11820603,
+    currentPeriodProfit: 3286028,
   },
   {
     name: "宏洋輪1號",
@@ -121,9 +130,10 @@ const vessels = [
     estStock: 6930913,
     estTransit: 8831957,
     estProfitIncl: 19040764,
+    currentPeriodProfit: 6525842,
   },
   {
-    name: "OFFICE1（總管理處）",
+    name: "OFFICE1",
     revenue: 8250,
     cost: 2652963,
     opex: 919027,
@@ -134,6 +144,7 @@ const vessels = [
     estStock: 0,
     estTransit: 1087250,
     estProfitIncl: -20235881,
+    currentPeriodProfit: -21331381,
   },
 ];
 
@@ -147,6 +158,10 @@ const fleetTotal = {
   pretax: 11249754,
   estUnbilled: 111749255,
   estProfitIncl: 122768014,
+  // 最終損益：一律以「2026年當期損益(含預估收入,不含折舊)」為準（累積數，非單月數字）
+  currentPeriodProfit: 30052464,
+  currentPeriodStart: "2026/01",
+  currentPeriodEnd: "2026/06",
 };
 
 const costBreakdown = [
@@ -160,9 +175,21 @@ const costBreakdown = [
 ];
 
 const opexBreakdown = [
-  { name: "推銷費用", value: 37860110, color: "#2E86FF" },
-  { name: "管理費用", value: 20555091, color: "#F2A93B" },
-  { name: "研究發展／其他", value: 919027, color: "#8B6BF2" },
+  {
+    name: "推銷費用",
+    value: 37860110,
+    color: "#2E86FF",
+    topItems: [{ name: "出口費用", value: 37860110 }],
+  },
+  {
+    name: "管理費用",
+    value: 20555091,
+    color: "#F2A93B",
+    topItems: [
+      { name: "辦公經費", value: 20031192 },
+      { name: "交際費", value: 523899 },
+    ],
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -260,6 +287,61 @@ const dayuTotal = dayuCompanies.reduce(
   }),
   { revenue: 0, cost: 0, grossProfit: 0, opex: 0, opProfit: 0, nonOp: 0, pretax: 0 }
 );
+
+// ---------------------------------------------------------------------------
+// 真實資料來源：202601~202606_貿易.xlsx（各月）／202506_貿易.xlsx（2025年6月）／
+// 202501-202506_貿易.xlsx（2025年1-6月累計）
+// 用於：累計數、月增(MoM)、年增(YoY) 比較
+// ---------------------------------------------------------------------------
+const tradeMonthly2026 = [
+  { month: "1月", revenue: 99795669, pretax: -46024 },
+  { month: "2月", revenue: 53820631, pretax: -7919455 },
+  { month: "3月", revenue: 70543254, pretax: -2412140 },
+  { month: "4月", revenue: 106822061, pretax: 6313967 },
+  { month: "5月", revenue: 155849581, pretax: 27824988 },
+  { month: "6月", revenue: 223643518, pretax: 2955638 },
+];
+
+const dayuMonthly2026 = [
+  { month: "1月", revenue: 19238075, pretax: -451262 },
+  { month: "2月", revenue: 6849837, pretax: -4763501 },
+  { month: "3月", revenue: 13869927, pretax: -1177455 },
+  { month: "4月", revenue: 9148827, pretax: -92408 },
+  { month: "5月", revenue: 16472904, pretax: -3782015 },
+  { month: "6月", revenue: 20438319, pretax: -406404 },
+];
+
+const tradeCumulative = {
+  revenue: 710474714,
+  cost: 640488316,
+  grossProfit: 69986398,
+  opex: 33007207,
+  opProfit: 36979191,
+  nonOp: -10262217,
+  pretax: 26716974,
+};
+
+const dayuCumulative = {
+  revenue: 86017889,
+  cost: 73505134,
+  grossProfit: 12512755,
+  opex: 20788915,
+  opProfit: -8276160,
+  nonOp: -2396885,
+  pretax: -10673045,
+};
+
+const tradeCompare = {
+  mom: { label: "月增（5月→6月）", prevLabel: "2026/05", currLabel: "2026/06", prevRevenue: 155849581, currRevenue: 223643518, prevPretax: 27824988, currPretax: 2955638 },
+  yoy: { label: "年增（單月，去年同月）", prevLabel: "2025/06", currLabel: "2026/06", prevRevenue: 49983008, currRevenue: 223643518, prevPretax: -2506959, currPretax: 2955638 },
+  yoyCum: { label: "年增（累計）", prevLabel: "2025年1–6月累計", currLabel: "2026年1–6月累計", prevRevenue: 406854068, currRevenue: 710474714, prevPretax: 911578, currPretax: 26716974 },
+};
+
+const dayuCompare = {
+  mom: { label: "月增（5月→6月）", prevLabel: "2026/05", currLabel: "2026/06", prevRevenue: 16472904, currRevenue: 20438319, prevPretax: -3782015, currPretax: -406404 },
+  yoy: { label: "年增（單月，去年同月）", prevLabel: "2025/06", currLabel: "2026/06", prevRevenue: 19208836, currRevenue: 20438319, prevPretax: -1064005, currPretax: -406404 },
+  yoyCum: { label: "年增（累計）", prevLabel: "2025年1–6月累計", currLabel: "2026年1–6月累計", prevRevenue: 132727315, currRevenue: 86017889, prevPretax: -6707217, currPretax: -10673045 },
+};
 
 const COMPANY_COLORS = ["#2E86FF", "#F2A93B", "#8B6BF2", "#14B8A6", "#EF6461", "#5DA9E9"];
 
@@ -616,7 +698,7 @@ function SegmentPlaceholder({ title, tags }) {
 // ---------------------------------------------------------------------------
 function ShippingPnl() {
   const rankedByProfit = useMemo(
-    () => [...vessels].sort((a, b) => b.pretax - a.pretax),
+    () => [...vessels].sort((a, b) => b.currentPeriodProfit - a.currentPeriodProfit),
     []
   );
   const [costActiveIndex, setCostActiveIndex] = useState(-1);
@@ -628,7 +710,7 @@ function ShippingPnl() {
     <div className="page-body">
       <div className="period-bar">
         <Ship size={16} />
-        <span>船務部・2026年6月損益表　（資料來源：202606FS.xlsx，6艘作業船 + 總管理處）</span>
+        <span>船務部・2026年1月–6月損益表（累積）　（資料來源：202606FS.xlsx，6艘作業船 + OFFICE1）</span>
         <span className="unit-badge">TWD</span>
       </div>
 
@@ -691,46 +773,36 @@ function ShippingPnl() {
           subColor={fleetTotal.opProfit < 0 ? "#EF6461" : "#14B8A6"}
         />
         <KpiCard
-          icon={<Landmark size={20} color="#fff" />}
-          iconBg="#EF6461"
-          label="稅前（稅後）損益"
-          value={fmtWan(fleetTotal.pretax)}
+          icon={fleetTotal.currentPeriodProfit < 0 ? <TrendingDown size={20} color="#fff" /> : <Anchor size={20} color="#fff" />}
+          iconBg={fleetTotal.currentPeriodProfit < 0 ? "#EF6461" : "#0B2A4A"}
+          label="最終損益（2026年累積）"
+          value={fmtWan(fleetTotal.currentPeriodProfit)}
           unit=""
-          sub="含營業外收支"
-          subValue={fmtWan(fleetTotal.nonOp)}
+          sub={fleetTotal.currentPeriodStart + "–" + fleetTotal.currentPeriodEnd + " 累計"}
+          subValue="含預估收入，不含折舊"
+          subColor="#0B2A4A"
         />
-        <KpiCard
-          icon={<Waves size={20} color="#fff" />}
-          iconBg="#5DA9E9"
-          label="預估船存及在途漁獲"
-          value={fmtWan(fleetTotal.estUnbilled)}
-          unit=""
-          sub="尚未認列收入"
-          subValue="6艘均在途/有存"
-          subColor="#F2A93B"
-        />
-        <KpiCard
-          icon={<Anchor size={20} color="#fff" />}
-          iconBg="#2E86FF"
-          label="預估月損益（含未認列）"
-          value={fmtWan(fleetTotal.estProfitIncl)}
-          unit=""
-          sub="含預估數"
-          subValue={"+" + fmtYi(fleetTotal.estProfitIncl - fleetTotal.pretax)}
-          subColor="#14B8A6"
-        />
+      </div>
+
+      <div className="insight-banner soft">
+        <Anchor size={18} color="#0B2A4A" style={{ flexShrink: 0 }} />
+        <div>
+          <b>本頁損益數字皆為 {fleetTotal.currentPeriodStart}–{fleetTotal.currentPeriodEnd} 累計數</b>
+          （非單月數字），其中「最終損益」固定採計
+          <b> 2026年當期損益（含預估收入，不含折舊）</b>，目前為 {fmtWan(fleetTotal.currentPeriodProfit)}，
+          會隨月份自動往後累加。
+        </div>
       </div>
 
       {/* 洞察卡 */}
       <div className="insight-banner">
         <AlertTriangle size={18} color="#F2A93B" style={{ flexShrink: 0 }} />
         <div>
-          <b>本月六艘船全數完成銷貨認列，營運面表現強勁</b>
+          <b>累計期間六艘船全數完成銷貨認列，營運面表現強勁</b>
           （毛利 {fmtWan(fleetTotal.grossProfit)}、營業淨利 {fmtWan(fleetTotal.opProfit)}），
           但受營業外收支影響 <b>{fmtWan(fleetTotal.nonOp)}</b>（{fmt(fleetTotal.nonOp)} 元，
-          主要反映在 OFFICE1／總管理處），使稅前損益降至 <b>{fmtWan(fleetTotal.pretax)}</b>。
+          主要反映在 OFFICE1），使稅前損益降至 <b>{fmtWan(fleetTotal.pretax)}</b>。
           建議確認該筆營業外支出的具體項目（如匯兌損失、利息費用等）以利後續追蹤。
-          另截至 6/30，船存及在途漁獲預估價值約 <b>{fmtWan(fleetTotal.estUnbilled)}</b> 尚未認列。
         </div>
       </div>
 
@@ -790,7 +862,9 @@ function ShippingPnl() {
         </div>
 
         <div className="panel">
-          <div className="panel-title">各船稅前損益排行（含船存/在途預估）</div>
+          <div className="panel-title">
+            各船最終損益排行（{fleetTotal.currentPeriodStart}–{fleetTotal.currentPeriodEnd} 累計，不含折舊）
+          </div>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart
               data={rankedByProfit}
@@ -808,14 +882,11 @@ function ShippingPnl() {
                 tickLine={false}
               />
               <Tooltip
-                formatter={(v, key) => [
-                  fmtWan(v) + " 元",
-                  key === "pretax" ? "帳列稅前損益" : "含預估收入損益",
-                ]}
+                formatter={(v) => [fmtWan(v) + " 元", "最終損益（累計）"]}
                 contentStyle={{ fontSize: 12 }}
               />
               <Bar
-                dataKey="pretax"
+                dataKey="currentPeriodProfit"
                 radius={[0, 6, 6, 0]}
                 barSize={12}
                 shape={(props) => renderActiveBarHorizontal(props, rankBarActive)}
@@ -827,13 +898,28 @@ function ShippingPnl() {
                 onClick={(_, i) => setRankBarActive(i === rankBarActive ? -1 : i)}
               >
                 {rankedByProfit.map((v, i) => (
-                  <Cell key={i} fill={v.pretax < 0 ? "#EF6461" : "#14B8A6"} />
+                  <Cell key={i} fill={v.currentPeriodProfit < 0 ? "#EF6461" : "#14B8A6"} />
                 ))}
                 <LabelList
-                  dataKey="pretax"
-                  position="right"
-                  formatter={(v) => fmtWan(v)}
-                  style={{ fontSize: 11, fill: "#425466", fontFamily: "var(--mono)" }}
+                  dataKey="currentPeriodProfit"
+                  content={(props) => {
+                    const { x, y, width, height, value } = props;
+                    // 不論正負，一律固定貼在長條的右側末端（x+width），
+                    // 避免 recharts 對負值長條預設把標籤丟到最外側（左側）跟座標軸文字疊在一起。
+                    return (
+                      <text
+                        x={x + width + 6}
+                        y={y + height / 2}
+                        dy={4}
+                        textAnchor="start"
+                        fontSize={11}
+                        fill="#425466"
+                        fontFamily="var(--mono)"
+                      >
+                        {fmtWan(value)}
+                      </text>
+                    );
+                  }}
                 />
               </Bar>
             </BarChart>
@@ -843,7 +929,9 @@ function ShippingPnl() {
 
       {/* 明細表 */}
       <div className="panel">
-        <div className="panel-title">各船損益明細（單位：元）</div>
+        <div className="panel-title">
+          各船損益明細（單位：元・{fleetTotal.currentPeriodStart}–{fleetTotal.currentPeriodEnd} 累計）
+        </div>
         <div className="table-wrap">
           <table>
             <thead>
@@ -856,6 +944,13 @@ function ShippingPnl() {
                 <th>營業淨利</th>
                 <th>稅前損益</th>
                 <th>船存/在途預估收入</th>
+                <th>
+                  最終損益
+                  <br />
+                  <span style={{ fontWeight: 400, fontSize: 10 }}>
+                    （{fleetTotal.currentPeriodStart}–{fleetTotal.currentPeriodEnd} 累計，不含折舊）
+                  </span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -877,6 +972,9 @@ function ShippingPnl() {
                     {fmtWan(v.pretax)}
                   </td>
                   <td>{v.estStock + v.estTransit > 0 ? fmtWan(v.estStock + v.estTransit) : "—"}</td>
+                  <td className={v.currentPeriodProfit < 0 ? "neg" : "pos"} style={{ fontWeight: 700 }}>
+                    {fmtWan(v.currentPeriodProfit)}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -896,6 +994,9 @@ function ShippingPnl() {
                   {fmtWan(fleetTotal.pretax)}
                 </td>
                 <td>{fmtWan(fleetTotal.estUnbilled)}</td>
+                <td className={fleetTotal.currentPeriodProfit < 0 ? "neg" : "pos"}>
+                  {fmtWan(fleetTotal.currentPeriodProfit)}
+                </td>
               </tr>
             </tfoot>
           </table>
@@ -906,19 +1007,28 @@ function ShippingPnl() {
         <div className="panel-title">營業費用結構</div>
         <div className="opex-bars">
           {opexBreakdown.map((o) => (
-            <div className="opex-row" key={o.name}>
-              <span className="opex-name">{o.name}</span>
-              <div className="opex-track">
-                <div
-                  className="opex-fill"
-                  style={{
-                    width: pct(o.value, fleetTotal.opex) + "%",
-                    background: o.color,
-                  }}
-                />
+            <div className="opex-group" key={o.name}>
+              <div className="opex-row">
+                <span className="opex-name">{o.name}</span>
+                <div className="opex-track">
+                  <div
+                    className="opex-fill"
+                    style={{
+                      width: pct(o.value, fleetTotal.opex) + "%",
+                      background: o.color,
+                    }}
+                  />
+                </div>
+                <span className="opex-value">{fmtWan(o.value)}</span>
+                <span className="opex-pct">{pct(o.value, fleetTotal.opex)}%</span>
               </div>
-              <span className="opex-value">{fmtWan(o.value)}</span>
-              <span className="opex-pct">{pct(o.value, fleetTotal.opex)}%</span>
+              <div className="opex-subitems">
+                {o.topItems.map((it) => (
+                  <span className="opex-subitem" key={it.name}>
+                    {it.name} {fmtWan(it.value)}（{pct(it.value, o.value)}%）
+                  </span>
+                ))}
+              </div>
             </div>
           ))}
         </div>
@@ -928,15 +1038,154 @@ function ShippingPnl() {
 }
 
 // ---------------------------------------------------------------------------
+// 月度趨勢圖（營收長條 + 稅前損益折線）
+// ---------------------------------------------------------------------------
+function MonthlyTrendChart({ data, title }) {
+  return (
+    <div className="panel">
+      <div className="panel-title">{title}</div>
+      <ResponsiveContainer width="100%" height={280}>
+        <ComposedChart data={data} margin={{ left: 4, right: 8, top: 10, bottom: 4 }}>
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#EEF1F5" />
+          <XAxis dataKey="month" tick={{ fontSize: 12, fill: "#425466" }} axisLine={false} tickLine={false} />
+          <YAxis yAxisId="rev" hide />
+          <YAxis yAxisId="pretax" orientation="right" hide />
+          <Tooltip
+            formatter={(v, name) => [fmtWan(v) + " 元", name === "revenue" ? "營業收入" : "稅前損益"]}
+            contentStyle={{ fontSize: 12 }}
+          />
+          <Legend
+            formatter={(v) => (v === "revenue" ? "營業收入" : "稅前損益（虛線為 0，紅點＝虧損）")}
+            wrapperStyle={{ fontSize: 12 }}
+          />
+          <Bar yAxisId="rev" dataKey="revenue" fill="#BFD9FF" radius={[5, 5, 0, 0]} barSize={30} isAnimationActive animationDuration={800}>
+            <LabelList
+              dataKey="revenue"
+              position="top"
+              formatter={(v) => fmtWan(v)}
+              style={{ fontSize: 10, fill: "#5B7BA8", fontFamily: "var(--mono)" }}
+            />
+          </Bar>
+          {/* 0 元基準線：讓稅前損益的正負一眼可辨，折線在這條線以下就代表虧損 */}
+          <ReferenceLine yAxisId="pretax" y={0} stroke="#94A3B8" strokeDasharray="4 4" />
+          <Line
+            yAxisId="pretax"
+            type="monotone"
+            dataKey="pretax"
+            stroke="#425466"
+            strokeWidth={2}
+            dot={(props) => {
+              const { cx, cy, payload, index } = props;
+              const isNeg = payload.pretax < 0;
+              return (
+                <circle
+                  key={`dot-${index}`}
+                  cx={cx}
+                  cy={cy}
+                  r={4.5}
+                  fill={isNeg ? "#EF6461" : "#14B8A6"}
+                  stroke="#fff"
+                  strokeWidth={1.5}
+                />
+              );
+            }}
+            isAnimationActive
+            animationDuration={900}
+          >
+            <LabelList
+              dataKey="pretax"
+              content={(props) => {
+                const { x, y, index } = props;
+                const val = data[index].pretax;
+                const isNeg = val < 0;
+                return (
+                  <text
+                    x={x}
+                    y={isNeg ? y + 16 : y - 8}
+                    textAnchor="middle"
+                    fontSize={10.5}
+                    fontWeight={700}
+                    fill={isNeg ? "#EF6461" : "#14B8A6"}
+                    fontFamily="var(--mono)"
+                  >
+                    {isNeg ? "" : "+"}
+                    {fmtWan(val)}
+                  </text>
+                );
+              }}
+            />
+          </Line>
+        </ComposedChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+
+function CompareBarChart({ compare, metric, title, unit }) {
+  const data = [
+    { name: "前期比較", prev: compare.mom[`prev${metric}`], curr: compare.mom[`curr${metric}`] },
+    { name: "去年同期", prev: compare.yoy[`prev${metric}`], curr: compare.yoy[`curr${metric}`] },
+    { name: "累計數", prev: compare.yoyCum[`prev${metric}`], curr: compare.yoyCum[`curr${metric}`] },
+  ];
+  const [active, setActive] = useState(-1);
+
+  return (
+    <div className="panel">
+      <div className="panel-title">{title}比較（前期 vs 本期）</div>
+      <ResponsiveContainer width="100%" height={220}>
+        <BarChart data={data} margin={{ left: 4, right: 8, top: 20, bottom: 4 }} barGap={4}>
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#EEF1F5" />
+          <XAxis dataKey="name" tick={{ fontSize: 12, fill: "#425466" }} axisLine={false} tickLine={false} />
+          <YAxis hide />
+          <Tooltip formatter={(v) => fmtWan(v) + unit} contentStyle={{ fontSize: 12 }} />
+          <Legend formatter={(v) => (v === "prev" ? "前期" : "本期")} wrapperStyle={{ fontSize: 12 }} />
+          <Bar
+            dataKey="prev"
+            fill="#B8C2CE"
+            radius={[5, 5, 0, 0]}
+            barSize={28}
+            isAnimationActive
+            animationDuration={800}
+            animationEasing="ease-out"
+          >
+            <LabelList dataKey="prev" position="top" formatter={(v) => fmtWan(v)} style={{ fontSize: 10, fill: "#8B95A5", fontFamily: "var(--mono)" }} />
+          </Bar>
+          <Bar
+            dataKey="curr"
+            radius={[5, 5, 0, 0]}
+            barSize={28}
+            shape={(props) => renderActiveBarVertical(props, active)}
+            onMouseEnter={(_, i) => setActive(i)}
+            onMouseLeave={() => setActive(-1)}
+            isAnimationActive
+            animationDuration={800}
+            animationEasing="ease-out"
+          >
+            {data.map((d, i) => (
+              <Cell key={i} fill={d.curr >= d.prev ? "#14B8A6" : "#EF6461"} />
+            ))}
+            <LabelList dataKey="curr" position="top" formatter={(v) => fmtWan(v)} style={{ fontSize: 10.5, fontWeight: 700, fill: "#425466", fontFamily: "var(--mono)" }} />
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+function CompareSection({ compare }) {
+  return (
+    <div className="chart-row">
+      <CompareBarChart compare={compare} metric="Revenue" title="營業收入" unit=" 元" />
+      <CompareBarChart compare={compare} metric="Pretax" title="稅前損益" unit=" 元" />
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // 通用「事業群損益」頁（貿易 / 大漁 共用）
 // ---------------------------------------------------------------------------
-function CompanySegmentPnl({ periodLabel, sourceLabel, companies, total, icon: Icon, accent, insight }) {
-  const donutData = companies
-    .filter((c) => c.revenue > 0)
-    .map((c, i) => ({ name: c.name, value: c.revenue, color: COMPANY_COLORS[i % COMPANY_COLORS.length] }));
-  const ranked = [...companies].sort((a, b) => b.pretax - a.pretax);
-  const [revActiveIndex, setRevActiveIndex] = useState(-1);
-  const [rankBarActive, setRankBarActive] = useState(-1);
+function CompanySegmentPnl({ periodLabel, sourceLabel, companies, total, icon: Icon, accent, insight, cumulative, monthly, compare }) {
 
   return (
     <div className="page-body">
@@ -992,166 +1241,64 @@ function CompanySegmentPnl({ periodLabel, sourceLabel, companies, total, icon: I
         />
       </div>
 
+      {cumulative && (
+        <>
+          <div className="period-bar" style={{ marginTop: 6 }}>
+            <TrendingUp size={16} />
+            <span>累計數（2026年1–6月）</span>
+          </div>
+          <div className="kpi-grid">
+            <KpiCard
+              icon={<Wallet size={20} color="#fff" />}
+              iconBg="#2E86FF"
+              label="累計營業收入"
+              value={fmtWan(cumulative.revenue)}
+              unit=""
+            />
+            <KpiCard
+              icon={<TrendingUp size={20} color="#fff" />}
+              iconBg="#14B8A6"
+              label="累計營業毛利"
+              value={fmtWan(cumulative.grossProfit)}
+              unit=""
+              sub="毛利率"
+              subValue={pct(cumulative.grossProfit, cumulative.revenue) + "%"}
+              subColor="#14B8A6"
+            />
+            <KpiCard
+              icon={<Landmark size={20} color="#fff" />}
+              iconBg={cumulative.opProfit < 0 ? "#EF6461" : "#14B8A6"}
+              label="累計營業淨利"
+              value={fmtWan(cumulative.opProfit)}
+              unit=""
+              sub="營益率"
+              subValue={pct(cumulative.opProfit, cumulative.revenue) + "%"}
+              subColor={cumulative.opProfit < 0 ? "#EF6461" : "#14B8A6"}
+            />
+            <KpiCard
+              icon={cumulative.pretax < 0 ? <TrendingDown size={20} color="#fff" /> : <Anchor size={20} color="#fff" />}
+              iconBg={cumulative.pretax < 0 ? "#EF6461" : "#0B2A4A"}
+              label="累計稅前損益"
+              value={fmtWan(cumulative.pretax)}
+              unit=""
+              sub="稅前淨利率"
+              subValue={pct(cumulative.pretax, cumulative.revenue) + "%"}
+              subColor={cumulative.pretax < 0 ? "#EF6461" : "#0B2A4A"}
+            />
+          </div>
+        </>
+      )}
+
+      {monthly && <MonthlyTrendChart data={monthly} title="月度趨勢（2026年1–6月，營業收入＋稅前損益）" />}
+
+      {compare && <CompareSection compare={compare} />}
+
       {insight && (
         <div className="insight-banner">
           <AlertTriangle size={18} color="#F2A93B" style={{ flexShrink: 0 }} />
           <div>{insight}</div>
         </div>
       )}
-
-      <div className="chart-row">
-        <div className="panel">
-          <div className="panel-title">各公司營收占比</div>
-          <div className="donut-wrap">
-            <div className="donut-chart-box">
-            <ResponsiveContainer width="100%" height={240}>
-              <PieChart>
-                <Pie
-                  data={donutData}
-                  dataKey="value"
-                  nameKey="name"
-                  innerRadius={58}
-                  outerRadius={90}
-                  paddingAngle={2}
-                  stroke="none"
-                  activeIndex={revActiveIndex}
-                  activeShape={renderActiveDonutShape}
-                  isAnimationActive={true}
-                  animationDuration={800}
-                  animationEasing="ease-out"
-                  onMouseEnter={(_, i) => setRevActiveIndex(i)}
-                  onMouseLeave={() => setRevActiveIndex(-1)}
-                  onClick={(_, i) => setRevActiveIndex(i === revActiveIndex ? -1 : i)}
-                >
-                  {donutData.map((entry, i) => (
-                    <Cell key={i} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(v) => fmtWan(v) + " 元"} contentStyle={{ fontSize: 12 }} />
-              </PieChart>
-            </ResponsiveContainer>
-              <div className="donut-center-label">
-                <div className="donut-center-title">總營收</div>
-                <div className="donut-center-value">{fmtWan(total.revenue)}</div>
-                <div className="donut-center-unit">元</div>
-              </div>
-            </div>
-            <div className="donut-legend">
-              {companies.map((c, i) => (
-                <div className="legend-row" key={c.name}>
-                  <span
-                    className="legend-dot"
-                    style={{ background: COMPANY_COLORS[i % COMPANY_COLORS.length] }}
-                  />
-                  <span className="legend-name">{c.name}</span>
-                  <span className="legend-pct">
-                    {c.revenue > 0 ? pct(c.revenue, total.revenue) + "%" : "無銷貨"}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="panel">
-          <div className="panel-title">各公司稅前損益排行</div>
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart
-              data={ranked}
-              layout="vertical"
-              margin={{ left: 8, right: 40, top: 4, bottom: 4 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#EEF1F5" />
-              <XAxis type="number" hide />
-              <YAxis
-                type="category"
-                dataKey="name"
-                width={90}
-                tick={{ fontSize: 12, fill: "#425466" }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip formatter={(v) => fmtWan(v) + " 元"} contentStyle={{ fontSize: 12 }} />
-              <Bar
-                dataKey="pretax"
-                radius={[0, 6, 6, 0]}
-                barSize={16}
-                shape={(props) => renderActiveBarHorizontal(props, rankBarActive)}
-                isAnimationActive={true}
-                animationDuration={900}
-                animationEasing="ease-out"
-                onMouseEnter={(_, i) => setRankBarActive(i)}
-                onMouseLeave={() => setRankBarActive(-1)}
-                onClick={(_, i) => setRankBarActive(i === rankBarActive ? -1 : i)}
-              >
-                {ranked.map((c, i) => (
-                  <Cell key={i} fill={c.pretax < 0 ? "#EF6461" : "#14B8A6"} />
-                ))}
-                <LabelList
-                  dataKey="pretax"
-                  position="right"
-                  formatter={(v) => fmtWan(v)}
-                  style={{ fontSize: 11, fill: "#425466", fontFamily: "var(--mono)" }}
-                />
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      <div className="panel">
-        <div className="panel-title">各公司損益明細（單位：元）</div>
-        <div className="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th className="left">公司</th>
-                <th>營業收入</th>
-                <th>營業成本</th>
-                <th>營業毛利</th>
-                <th>營業費用</th>
-                <th>營業淨利</th>
-                <th>營業外收支</th>
-                <th>稅前損益</th>
-              </tr>
-            </thead>
-            <tbody>
-              {companies.map((c) => (
-                <tr key={c.name}>
-                  <td className="left name-cell">
-                    <span
-                      className="legend-dot"
-                      style={{
-                        background: COMPANY_COLORS[companies.indexOf(c) % COMPANY_COLORS.length],
-                      }}
-                    />
-                    {c.name}
-                  </td>
-                  <td>{fmtWan(c.revenue)}</td>
-                  <td>{fmtWan(c.cost)}</td>
-                  <td className={c.grossProfit < 0 ? "neg" : "pos"}>{fmtWan(c.grossProfit)}</td>
-                  <td>{fmtWan(c.opex)}</td>
-                  <td className={c.opProfit < 0 ? "neg" : "pos"}>{fmtWan(c.opProfit)}</td>
-                  <td className={c.nonOp < 0 ? "neg" : "pos"}>{fmtWan(c.nonOp)}</td>
-                  <td className={c.pretax < 0 ? "neg" : "pos"}>{fmtWan(c.pretax)}</td>
-                </tr>
-              ))}
-            </tbody>
-            <tfoot>
-              <tr>
-                <td className="left">{accent}合計</td>
-                <td>{fmtWan(total.revenue)}</td>
-                <td>{fmtWan(total.cost)}</td>
-                <td className={total.grossProfit < 0 ? "neg" : "pos"}>{fmtWan(total.grossProfit)}</td>
-                <td>{fmtWan(total.opex)}</td>
-                <td className={total.opProfit < 0 ? "neg" : "pos"}>{fmtWan(total.opProfit)}</td>
-                <td className={total.nonOp < 0 ? "neg" : "pos"}>{fmtWan(total.nonOp)}</td>
-                <td className={total.pretax < 0 ? "neg" : "pos"}>{fmtWan(total.pretax)}</td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-      </div>
     </div>
   );
 }
@@ -1170,6 +1317,8 @@ function ConsolidatedOverview() {
       color: "#8B6BF2",
       total: tradeTotal,
       note: "海之寶＋廣宏＋O.K.",
+      finalLabel: "稅前損益",
+      finalValue: tradeTotal.pretax,
     },
     {
       key: "dayu",
@@ -1179,15 +1328,19 @@ function ConsolidatedOverview() {
       color: "#F2A93B",
       total: dayuTotal,
       note: "大漁＋海和＋正洋",
+      finalLabel: "稅前損益",
+      finalValue: dayuTotal.pretax,
     },
     {
       key: "shipping",
       label: "船務損益",
-      period: "2026/06",
+      period: "2026/01–06",
       icon: Ship,
       color: "#2E86FF",
       total: fleetTotal,
-      note: "6艘作業船＋總管理處",
+      note: "6艘作業船＋OFFICE1",
+      finalLabel: "最終損益（累計）",
+      finalValue: fleetTotal.currentPeriodProfit,
     },
   ];
 
@@ -1199,7 +1352,7 @@ function ConsolidatedOverview() {
       opex: acc.opex + s.total.opex,
       opProfit: acc.opProfit + (s.total.opProfit ?? s.total.grossProfit - s.total.opex),
       nonOp: acc.nonOp + (s.total.nonOp ?? 0),
-      pretax: acc.pretax + s.total.pretax,
+      pretax: acc.pretax + s.finalValue,
     }),
     { revenue: 0, cost: 0, grossProfit: 0, opex: 0, opProfit: 0, nonOp: 0, pretax: 0 }
   );
@@ -1208,7 +1361,7 @@ function ConsolidatedOverview() {
     <div className="page-body">
       <div className="period-bar">
         <PieIcon size={16} />
-        <span>集團損益合併總覽・2026年6月　（貿易／大漁／船務三事業群同期加總）</span>
+        <span>集團損益合併總覽　（貿易／大漁：2026年6月單月；船務：2026年1–6月累計）</span>
         <span className="unit-badge">TWD</span>
       </div>
 
@@ -1235,10 +1388,10 @@ function ConsolidatedOverview() {
         <KpiCard
           icon={<Landmark size={20} color="#fff" />}
           iconBg={grandTotal.pretax < 0 ? "#EF6461" : "#14B8A6"}
-          label="集團合併稅前損益"
+          label="集團合併損益"
           value={fmtWan(grandTotal.pretax)}
           unit=""
-          sub="稅前淨利率"
+          sub="合併淨利率"
           subValue={pct(grandTotal.pretax, grandTotal.revenue) + "%"}
           subColor={grandTotal.pretax < 0 ? "#EF6461" : "#14B8A6"}
         />
@@ -1247,7 +1400,9 @@ function ConsolidatedOverview() {
       <div className="insight-banner soft">
         <FileWarning size={18} color="#5DA9E9" style={{ flexShrink: 0 }} />
         <div>
-          三個事業群本次資料期間皆為 <b>2026年6月</b>，以下為單純加總三張損益表得出的集團數字，
+          貿易／大漁採計 <b>2026年6月單月稅前損益</b>，船務採計
+          <b> 2026年1–6月累計最終損益（含預估收入，不含折舊）</b>，
+          三者計算基準與期間皆不同，以下為單純加總三張損益表得出的集團數字，
           尚未處理集團內交易（例如船務銷貨予貿易部門）的抵銷分錄，正式合併報表請留意內部交易沖銷。
         </div>
       </div>
@@ -1277,8 +1432,8 @@ function ConsolidatedOverview() {
                 </b>
               </div>
               <div className="segment-row">
-                <span>稅前損益</span>
-                <b className={s.total.pretax < 0 ? "neg" : "pos"}>{fmtWan(s.total.pretax)}</b>
+                <span>{s.finalLabel}</span>
+                <b className={s.finalValue < 0 ? "neg" : "pos"}>{fmtWan(s.finalValue)}</b>
               </div>
             </div>
           );
@@ -1286,10 +1441,10 @@ function ConsolidatedOverview() {
       </div>
 
       <div className="panel">
-        <div className="panel-title">各事業群稅前損益比較（2026年6月）</div>
+        <div className="panel-title">各事業群損益比較（各自採計基準與期間，詳見上方說明）</div>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart
-            data={segments.map((s) => ({ name: s.label, pretax: s.total.pretax }))}
+            data={segments.map((s) => ({ name: s.label, pretax: s.finalValue }))}
             margin={{ left: 8, right: 24, top: 10, bottom: 4 }}
           >
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#EEF1F5" />
@@ -1309,7 +1464,7 @@ function ConsolidatedOverview() {
               onClick={(_, i) => setSegBarActive(i === segBarActive ? -1 : i)}
             >
               {segments.map((s, i) => (
-                <Cell key={i} fill={s.total.pretax < 0 ? "#EF6461" : "#14B8A6"} />
+                <Cell key={i} fill={s.finalValue < 0 ? "#EF6461" : "#14B8A6"} />
               ))}
               <LabelList dataKey="pretax" position="top" formatter={(v) => fmtWan(v)} style={{ fontSize: 12, fontFamily: "var(--mono)", fontWeight: 700 }} />
             </Bar>
@@ -2450,15 +2605,24 @@ function Dashboard() {
             {pnlTab === "trade" && (
               <CompanySegmentPnl
                 periodLabel="貿易損益・2026年6月"
-                sourceLabel="202606_貿易.xlsx（海之寶＋廣宏＋O.K.）"
+                sourceLabel="202606_貿易.xlsx（海之寶＋廣宏＋O.K.＋廣宏(東港)）"
                 companies={tradeCompanies}
                 total={tradeTotal}
+                cumulative={tradeCumulative}
+                monthly={tradeMonthly2026}
+                compare={tradeCompare}
                 icon={Package}
                 accent="貿易"
                 insight={
                   <>
-                    <b>O.K. 貢獻貿易事業群約 {pct(215085924, tradeTotal.revenue)}% 的營收</b>
-                    ，集中度偏高；海之寶本月無銷貨收入，但仍有 {fmtWan(2287931)} 元管理費用，處於淨損狀態，建議留意其營運規劃。
+                    <b>貿易事業群本月毛利率 {pct(tradeTotal.grossProfit, tradeTotal.revenue)}%</b>
+                    ，營業費用控管良好（費用率僅 {pct(tradeTotal.opex, tradeTotal.revenue)}%）；
+                    但營業外收支虧損 {fmtWan(Math.abs(tradeTotal.nonOp))} 元，
+                    是稅前淨利率由 {pct(tradeTotal.opProfit, tradeTotal.revenue)}% 降至
+                    {pct(tradeTotal.pretax, tradeTotal.revenue)}% 的主因，
+                    建議追蹤該筆營業外損失的具體來源（如匯兌、利息等）。
+                    累計來看，1–6月營收 {fmtWan(tradeCumulative.revenue)}、稅前損益
+                    {fmtWan(tradeCumulative.pretax)}，較去年同期（稅前 {fmtWan(tradeCompare.yoyCum.prevPretax)}）明顯成長。
                   </>
                 }
               />
@@ -2469,13 +2633,22 @@ function Dashboard() {
                 sourceLabel="202606_貿易.xlsx（大漁＋海和＋正洋）"
                 companies={dayuCompanies}
                 total={dayuTotal}
+                cumulative={dayuCumulative}
+                monthly={dayuMonthly2026}
+                compare={dayuCompare}
                 icon={Waves}
                 accent="大漁"
                 insight={
                   <>
-                    大漁事業群整體稅前為虧損 <b>{fmtWan(Math.abs(dayuTotal.pretax))}</b> 元，主要受
-                    <b>大漁</b>（稅前 -413,323）與 <b>海和</b>（稅前 -161,541）拖累；
-                    <b>正洋</b>維持獲利（稅前 +168,460），三家合計營收有 97% 集中在大漁一家公司。
+                    <b>大漁事業群毛利率 {pct(dayuTotal.grossProfit, dayuTotal.revenue)}% 尚可</b>
+                    ，但營業費用幾乎吃掉全部毛利（營業淨利率僅
+                    {pct(dayuTotal.opProfit, dayuTotal.revenue)}%），
+                    加上營業外收支虧損 {fmtWan(Math.abs(dayuTotal.nonOp))} 元，
+                    最終稅前為虧損 {fmtWan(Math.abs(dayuTotal.pretax))} 元，
+                    建議檢視營業費用結構是否有精簡空間。
+                    累計來看，1–6月營收 {fmtWan(dayuCumulative.revenue)}、稅前為虧損
+                    {fmtWan(Math.abs(dayuCumulative.pretax))} 元，較去年同期（稅前虧損
+                    {fmtWan(Math.abs(dayuCompare.yoyCum.prevPretax))} 元）虧損幅度擴大，建議留意全年度獲利狀況。
                   </>
                 }
               />
@@ -2821,8 +2994,17 @@ tfoot td{
 tfoot td.left{text-align:left;font-family:inherit;}
 .pos{color:var(--teal);}
 .neg{color:var(--coral);}
-.opex-bars{display:flex;flex-direction:column;gap:12px;}
+.opex-bars{display:flex;flex-direction:column;gap:18px;}
+.opex-group{display:flex;flex-direction:column;gap:6px;}
 .opex-row{display:grid;grid-template-columns:130px 1fr 90px 44px;align-items:center;gap:10px;font-size:12.5px;}
+.opex-subitems{
+  display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+  padding-left:2px;font-size:11.5px;color:var(--muted);
+}
+.opex-subitem{
+  font-family:var(--mono);color:var(--text);background:#F8FAFC;border:1px solid var(--border);
+  border-radius:6px;padding:2px 8px;
+}
 .opex-name{color:var(--text);}
 .opex-track{background:#EEF1F5;border-radius:6px;height:9px;overflow:hidden;}
 .opex-fill{height:100%;border-radius:6px;}
