@@ -164,6 +164,23 @@ const fleetTotal = {
   currentPeriodEnd: "2026/06",
 };
 
+// ---------------------------------------------------------------------------
+// 真實資料來源：船隻動態1~6.xlsx（累積作業天數，2026年1–6月累計）
+// ---------------------------------------------------------------------------
+const vesselUtilization = {
+  totalDaysInPeriod: 181, // 2026/01/01–2026/06/30 共 181 天
+  vessels: [
+    { name: "MFu-666", days: 128 },
+    { name: "MFa-1", days: 79 },
+    { name: "MFa-168", days: 134 },
+    { name: "MFu-188", days: 137 },
+    { name: "宏洋輪", days: 123 },
+    { name: "宏洋輪1號", days: 103 },
+  ],
+};
+const fleetOperatingDays = vesselUtilization.vessels.reduce((s, v) => s + v.days, 0);
+const fleetAvailableDays = vesselUtilization.totalDaysInPeriod * vesselUtilization.vessels.length;
+
 const costBreakdown = [
   { name: "燃料油", value: 41855721, color: "#2E86FF" },
   { name: "船員薪資", value: 28829792, color: "#14B8A6" },
@@ -456,7 +473,7 @@ const shippingInvWeek = {
 };
 
 // ---------------------------------------------------------------------------
-// 真實資料來源：0804-貿易資金.xlsx／0804-船務資金.xlsx（資金狀況表，2026/08/04）
+// 真實資料來源：0805-貿易資金.xlsx／0805-船務資金.xlsx（資金狀況表，2026/08/05）
 // 115_8_3借款表.xlsx（集團借款總表）
 // ---------------------------------------------------------------------------
 function addCash(a, b) {
@@ -471,14 +488,14 @@ function addCash(a, b) {
 
 const cashByDept = {
   trade: {
-    TWD: { prev: 41654248, inflow: 0, outflow: 3900000, restricted: 19011150, balance: 18743098 },
-    USD: { prev: 1270117.56, inflow: 320000.0, outflow: 1397.1, restricted: 1050353.49, balance: 538366.97 },
-    JPY: { prev: 148837800, inflow: 0, outflow: 0, restricted: 71007646, balance: 77830154 },
+    TWD: { prev: 37758648, inflow: 1807065, outflow: 6751923, restricted: 19011150, balance: 13802640 },
+    USD: { prev: 1588720.46, inflow: 0, outflow: 319131.31, restricted: 1050353.49, balance: 219235.66 },
+    JPY: { prev: 148837800, inflow: 0, outflow: 2576630, restricted: 71007646, balance: 75253524 },
   },
   shipping: {
-    TWD: { prev: 11150316, inflow: 0, outflow: 0, restricted: 2564910, balance: 8585406 },
-    USD: { prev: 311444.41, inflow: 375515.38, outflow: 320010.0, restricted: 171377.98, balance: 195571.81 },
-    JPY: { prev: 359629599, inflow: 51071541, outflow: 59200000, restricted: 349920071, balance: 1581069 },
+    TWD: { prev: 10769316, inflow: 4272743, outflow: 4980874, restricted: 6258508, balance: 3802677 },
+    USD: { prev: 366949.79, inflow: 0, outflow: 7283.63, restricted: 171377.98, balance: 188288.18 },
+    JPY: { prev: 351501140, inflow: 0, outflow: 0, restricted: 349920071, balance: 1581069 },
   },
 };
 
@@ -784,16 +801,6 @@ function ShippingPnl() {
         />
       </div>
 
-      <div className="insight-banner soft">
-        <Anchor size={18} color="#0B2A4A" style={{ flexShrink: 0 }} />
-        <div>
-          <b>本頁損益數字皆為 {fleetTotal.currentPeriodStart}–{fleetTotal.currentPeriodEnd} 累計數</b>
-          （非單月數字），其中「最終損益」固定採計
-          <b> 2026年當期損益（含預估收入，不含折舊）</b>，目前為 {fmtWan(fleetTotal.currentPeriodProfit)}，
-          會隨月份自動往後累加。
-        </div>
-      </div>
-
       {/* 洞察卡 */}
       <div className="insight-banner">
         <AlertTriangle size={18} color="#F2A93B" style={{ flexShrink: 0 }} />
@@ -803,6 +810,74 @@ function ShippingPnl() {
           但受營業外收支影響 <b>{fmtWan(fleetTotal.nonOp)}</b>（{fmt(fleetTotal.nonOp)} 元，
           主要反映在 OFFICE1），使稅前損益降至 <b>{fmtWan(fleetTotal.pretax)}</b>。
           建議確認該筆營業外支出的具體項目（如匯兌損失、利息費用等）以利後續追蹤。
+        </div>
+      </div>
+
+      <div className="panel">
+        <div className="panel-title">
+          船隊利用率明細（{fleetTotal.currentPeriodStart}–{fleetTotal.currentPeriodEnd} 累計，可用天數 {vesselUtilization.totalDaysInPeriod} 天／船）
+        </div>
+        <ResponsiveContainer width="100%" height={220}>
+          <BarChart
+            data={[...vesselUtilization.vessels].sort((a, b) => b.days - a.days)}
+            layout="vertical"
+            margin={{ left: 8, right: 46, top: 4, bottom: 4 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#EEF1F5" />
+            <XAxis type="number" domain={[0, vesselUtilization.totalDaysInPeriod]} hide />
+            <YAxis
+              type="category"
+              dataKey="name"
+              width={90}
+              tick={{ fontSize: 12, fill: "#425466" }}
+              axisLine={false}
+              tickLine={false}
+            />
+            <Tooltip
+              formatter={(v) => [fmt(v) + " / " + vesselUtilization.totalDaysInPeriod + " 天（" + pct(v, vesselUtilization.totalDaysInPeriod) + "%）", "作業天數"]}
+              contentStyle={{ fontSize: 12 }}
+            />
+            <Bar dataKey="days" radius={[0, 6, 6, 0]} barSize={14} fill="#5DA9E9" isAnimationActive animationDuration={800} animationEasing="ease-out">
+              <LabelList
+                dataKey="days"
+                position="right"
+                formatter={(v) => pct(v, vesselUtilization.totalDaysInPeriod) + "%"}
+                style={{ fontSize: 11, fill: "#425466", fontFamily: "var(--mono)" }}
+              />
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th className="left">船舶</th>
+                <th>作業天數</th>
+                <th>可用天數</th>
+                <th>利用率</th>
+              </tr>
+            </thead>
+            <tbody>
+              {vesselUtilization.vessels.map((v) => (
+                <tr key={v.name}>
+                  <td className="left name-cell">
+                    <Ship size={14} color="#5DA9E9" /> {v.name}
+                  </td>
+                  <td>{fmt(v.days)}</td>
+                  <td>{fmt(vesselUtilization.totalDaysInPeriod)}</td>
+                  <td style={{ fontWeight: 700 }}>{pct(v.days, vesselUtilization.totalDaysInPeriod)}%</td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td className="left">船隊合計</td>
+                <td>{fmt(fleetOperatingDays)}</td>
+                <td>{fmt(fleetAvailableDays)}</td>
+                <td>{pct(fleetOperatingDays, fleetAvailableDays)}%</td>
+              </tr>
+            </tfoot>
+          </table>
         </div>
       </div>
 
@@ -1312,24 +1387,24 @@ function ConsolidatedOverview() {
     {
       key: "trade",
       label: "貿易損益",
-      period: "2026/06",
+      period: "2026/01–06",
       icon: Package,
       color: "#8B6BF2",
-      total: tradeTotal,
-      note: "海之寶＋廣宏＋O.K.",
-      finalLabel: "稅前損益",
-      finalValue: tradeTotal.pretax,
+      total: tradeCumulative,
+      note: "海之寶＋廣宏＋O.K.＋廣宏(東港)",
+      finalLabel: "稅前損益（累計）",
+      finalValue: tradeCumulative.pretax,
     },
     {
       key: "dayu",
       label: "大漁損益",
-      period: "2026/06",
+      period: "2026/01–06",
       icon: Waves,
       color: "#F2A93B",
-      total: dayuTotal,
+      total: dayuCumulative,
       note: "大漁＋海和＋正洋",
-      finalLabel: "稅前損益",
-      finalValue: dayuTotal.pretax,
+      finalLabel: "稅前損益（累計）",
+      finalValue: dayuCumulative.pretax,
     },
     {
       key: "shipping",
@@ -1361,7 +1436,7 @@ function ConsolidatedOverview() {
     <div className="page-body">
       <div className="period-bar">
         <PieIcon size={16} />
-        <span>集團損益合併總覽　（貿易／大漁：2026年6月單月；船務：2026年1–6月累計）</span>
+        <span>集團損益合併總覽・2026年1–6月累計　（貿易／大漁／船務三事業群同期累計加總）</span>
         <span className="unit-badge">TWD</span>
       </div>
 
@@ -1369,7 +1444,7 @@ function ConsolidatedOverview() {
         <KpiCard
           icon={<Wallet size={20} color="#fff" />}
           iconBg="#2E86FF"
-          label="集團合併營業收入"
+          label="集團合併累計營業收入"
           value={fmtWan(grandTotal.revenue)}
           unit=""
           sub="金額（元）"
@@ -1378,7 +1453,7 @@ function ConsolidatedOverview() {
         <KpiCard
           icon={<TrendingUp size={20} color="#fff" />}
           iconBg="#14B8A6"
-          label="集團合併毛利"
+          label="集團合併累計毛利"
           value={fmtWan(grandTotal.grossProfit)}
           unit=""
           sub="毛利率"
@@ -1388,7 +1463,7 @@ function ConsolidatedOverview() {
         <KpiCard
           icon={<Landmark size={20} color="#fff" />}
           iconBg={grandTotal.pretax < 0 ? "#EF6461" : "#14B8A6"}
-          label="集團合併損益"
+          label="集團合併累計損益"
           value={fmtWan(grandTotal.pretax)}
           unit=""
           sub="合併淨利率"
@@ -1400,10 +1475,9 @@ function ConsolidatedOverview() {
       <div className="insight-banner soft">
         <FileWarning size={18} color="#5DA9E9" style={{ flexShrink: 0 }} />
         <div>
-          貿易／大漁採計 <b>2026年6月單月稅前損益</b>，船務採計
-          <b> 2026年1–6月累計最終損益（含預估收入，不含折舊）</b>，
-          三者計算基準與期間皆不同，以下為單純加總三張損益表得出的集團數字，
-          尚未處理集團內交易（例如船務銷貨予貿易部門）的抵銷分錄，正式合併報表請留意內部交易沖銷。
+          三個事業群本頁數字皆為 <b>2026年1–6月累計數</b>（船務另含預估收入、不含折舊），
+          以下為單純加總三張損益表得出的集團數字，尚未處理集團內交易
+          （例如船務銷貨予貿易部門）的抵銷分錄，正式合併報表請留意內部交易沖銷。
         </div>
       </div>
 
@@ -1441,7 +1515,7 @@ function ConsolidatedOverview() {
       </div>
 
       <div className="panel">
-        <div className="panel-title">各事業群損益比較（各自採計基準與期間，詳見上方說明）</div>
+        <div className="panel-title">各事業群損益比較（2026年1–6月累計）</div>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart
             data={segments.map((s) => ({ name: s.label, pretax: s.finalValue }))}
@@ -1888,6 +1962,72 @@ function ShippingInventory() {
 // ---------------------------------------------------------------------------
 // 集團財務頁：資金狀況 ＋ 借款總表 ＋ AI 提醒
 // ---------------------------------------------------------------------------
+function CashAvailableCard({ title = "可動用餘額" }) {
+  const rows = [
+    { cur: "TWD", iconBg: "#2E86FF", balance: cashGroup.TWD.balance, restricted: cashGroup.TWD.restricted },
+    { cur: "USD", iconBg: "#14B8A6", balance: cashGroup.USD.balance, restricted: cashGroup.USD.restricted },
+    { cur: "JPY", iconBg: "#5DA9E9", balance: cashGroup.JPY.balance, restricted: cashGroup.JPY.restricted },
+  ];
+  return (
+    <div className="kpi-card" style={{ borderLeft: "3px solid #2E86FF" }}>
+      <div className="kpi-top">
+        <div className="kpi-icon" style={{ background: "linear-gradient(135deg, #2E86FF, #2E86FFCC)" }}>
+          <Wallet size={20} color="#fff" />
+        </div>
+        <span className="kpi-label">{title}</span>
+      </div>
+      {rows.map((r) => (
+        <div className="cash-avail-block" key={r.cur}>
+          <div className="kpi-value">
+            <span className="kpi-currency">{r.cur}</span>
+            {fmtWan(r.balance)}
+          </div>
+          <div className="kpi-sub">
+            <span className="kpi-sub-label">不可動用</span>
+            <span className="kpi-sub-value" style={{ color: "#EF6461" }}>
+              {r.cur} {fmtWan(r.restricted)}
+            </span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function NetCashFlowCard() {
+  const rows = [
+    { cur: "TWD", iconBg: "#2E86FF", inflow: cashGroup.TWD.inflow, outflow: cashGroup.TWD.outflow },
+    { cur: "USD", iconBg: "#14B8A6", inflow: cashGroup.USD.inflow, outflow: cashGroup.USD.outflow },
+  ];
+  return (
+    <div className="kpi-card" style={{ borderLeft: "3px solid #14B8A6" }}>
+      <div className="kpi-top">
+        <div className="kpi-icon" style={{ background: "linear-gradient(135deg, #14B8A6, #14B8A6CC)" }}>
+          <TrendingUp size={20} color="#fff" />
+        </div>
+        <span className="kpi-label">當日淨現金流</span>
+      </div>
+      {rows.map((r) => {
+        const net = r.inflow - r.outflow;
+        return (
+          <div className="cash-avail-block" key={r.cur}>
+            <div className="kpi-value" style={{ color: net < 0 ? "#EF6461" : "var(--text)" }}>
+              <span className="kpi-currency">{r.cur}</span>
+              {fmtWan(net)}
+            </div>
+            <div className="kpi-sub">
+              <span className="kpi-sub-label">收入 / 支出</span>
+              <span className="kpi-sub-value">
+                {r.cur} {fmtWan(r.inflow)} / {fmtWan(r.outflow)}
+              </span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function MiniRatioDonut({ label, used, total, color }) {
   const data = [
     { name: "已使用", value: used, color },
@@ -1996,6 +2136,68 @@ function LoanDeptTable() {
   );
 }
 
+function LoanTotalCard() {
+  const rows = [
+    { cur: "TWD", iconBg: "#EF6461", value: loanTotals.group.TWD, pctUsed: pct(creditLine.TWD.used, creditLine.TWD.total) },
+    { cur: "USD", iconBg: "#F2A93B", value: loanTotals.group.USD, pctUsed: pct(creditLine.USD.used, creditLine.USD.total) },
+  ];
+  return (
+    <div className="kpi-card" style={{ borderLeft: "3px solid #EF6461" }}>
+      <div className="kpi-top">
+        <div className="kpi-icon" style={{ background: "linear-gradient(135deg, #EF6461, #EF6461CC)" }}>
+          <Building2 size={20} color="#fff" />
+        </div>
+        <span className="kpi-label">借款總額</span>
+      </div>
+      {rows.map((r) => (
+        <div className="cash-avail-block" key={r.cur}>
+          <div className="kpi-value">
+            <span className="kpi-currency">{r.cur}</span>
+            {fmtWan(r.value)}
+          </div>
+          <div className="kpi-sub">
+            <span className="kpi-sub-label">授信使用率</span>
+            <span className="kpi-sub-value" style={{ color: "#EF6461" }}>
+              {r.pctUsed}%
+            </span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function LoanAvailableCard() {
+  const rows = [
+    { cur: "TWD", iconBg: "#14B8A6", available: creditLine.TWD.available, total: creditLine.TWD.total },
+    { cur: "USD", iconBg: "#8B6BF2", available: creditLine.USD.available, total: creditLine.USD.total },
+  ];
+  return (
+    <div className="kpi-card" style={{ borderLeft: "3px solid #14B8A6" }}>
+      <div className="kpi-top">
+        <div className="kpi-icon" style={{ background: "linear-gradient(135deg, #14B8A6, #14B8A6CC)" }}>
+          <Wallet size={20} color="#fff" />
+        </div>
+        <span className="kpi-label">剩餘可用額度</span>
+      </div>
+      {rows.map((r) => (
+        <div className="cash-avail-block" key={r.cur}>
+          <div className="kpi-value">
+            <span className="kpi-currency">{r.cur}</span>
+            {fmtWan(r.available)}
+          </div>
+          <div className="kpi-sub">
+            <span className="kpi-sub-label">總額度</span>
+            <span className="kpi-sub-value">
+              {r.cur} {fmtYi(r.total)}
+            </span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function FinancePage() {
   const [cashDetailOpen, setCashDetailOpen] = useState(false);
   const twdRestrictedPct = pct(cashGroup.TWD.restricted, cashGroup.TWD.prev + cashGroup.TWD.inflow - cashGroup.TWD.outflow);
@@ -2013,56 +2215,12 @@ function FinancePage() {
       {/* ---------- 區塊一：資金狀況 ---------- */}
       <div className="period-bar">
         <CircleDollarSign size={16} />
-        <span>資金狀況・2026/08/04　（資料來源：0804-貿易資金.xlsx ＋ 0804-船務資金.xlsx，貿易＋船務合計）</span>
+        <span>資金狀況・2026/08/05　（資料來源：0805-貿易資金.xlsx ＋ 0805-船務資金.xlsx，貿易＋船務合計）</span>
       </div>
 
-      <div className="kpi-grid">
-        <KpiCard
-          icon={<Wallet size={20} color="#fff" />}
-          iconBg="#2E86FF"
-          label="TWD 可動用餘額"
-          currency="TWD"
-          value={fmtWan(cashGroup.TWD.balance)}
-          unit=""
-          sub="不可動用"
-          subValue={"TWD " + fmtWan(cashGroup.TWD.restricted)}
-          subColor="#EF6461"
-          linkTo="cash-detail-table"
-        />
-        <KpiCard
-          icon={<Wallet size={20} color="#fff" />}
-          iconBg="#14B8A6"
-          label="USD 可動用餘額"
-          currency="USD"
-          value={fmtWan(cashGroup.USD.balance)}
-          unit=""
-          sub="不可動用"
-          subValue={"USD " + fmtWan(cashGroup.USD.restricted)}
-          subColor="#EF6461"
-          linkTo="cash-detail-table"
-        />
-        <KpiCard
-          icon={<Wallet size={20} color="#fff" />}
-          iconBg="#5DA9E9"
-          label="JPY 可動用餘額"
-          currency="JPY"
-          value={fmtWan(cashGroup.JPY.balance)}
-          unit=""
-          sub="不可動用"
-          subValue={"JPY " + fmtWan(cashGroup.JPY.restricted)}
-          subColor="#EF6461"
-          linkTo="cash-detail-table"
-        />
-        <KpiCard
-          icon={cashGroup.TWD.inflow - cashGroup.TWD.outflow < 0 ? <TrendingDown size={20} color="#fff" /> : <TrendingUp size={20} color="#fff" />}
-          iconBg={cashGroup.TWD.inflow - cashGroup.TWD.outflow < 0 ? "#EF6461" : "#14B8A6"}
-          label="當日淨現金流（TWD）"
-          value={fmtWan(cashGroup.TWD.inflow - cashGroup.TWD.outflow)}
-          unit=""
-          sub="收入 / 支出"
-          subValue={fmtWan(cashGroup.TWD.inflow) + " / " + fmtWan(cashGroup.TWD.outflow)}
-          linkTo="cash-detail-table"
-        />
+      <div className="chart-row">
+        <CashAvailableCard />
+        <NetCashFlowCard />
       </div>
 
       <div className="panel">
@@ -2099,54 +2257,10 @@ function FinancePage() {
         <span>借款總表・截至 2026/08/03　（資料來源：115_8_3借款表.xlsx）</span>
       </div>
 
-      <div className="kpi-grid">
-        <KpiCard
-          icon={<Building2 size={20} color="#fff" />}
-          iconBg="#EF6461"
-          label="TWD 借款總額"
-          currency="TWD"
-          value={fmtWan(loanTotals.group.TWD)}
-          unit=""
-          sub="授信使用率"
-          subValue={twdCreditUsedPct + "%"}
-          subColor="#EF6461"
-          linkTo="loan-dept-table"
-        />
-        <KpiCard
-          icon={<Building2 size={20} color="#fff" />}
-          iconBg="#F2A93B"
-          label="USD 借款總額"
-          currency="USD"
-          value={fmtWan(loanTotals.group.USD)}
-          unit=""
-          sub="授信使用率"
-          subValue={usdCreditUsedPct + "%"}
-          subColor="#EF6461"
-          linkTo="loan-dept-table"
-        />
-        <KpiCard
-          icon={<Wallet size={20} color="#fff" />}
-          iconBg="#14B8A6"
-          label="TWD 剩餘可用額度"
-          currency="TWD"
-          value={fmtWan(creditLine.TWD.available)}
-          unit=""
-          sub="總額度"
-          subValue={"TWD " + fmtYi(creditLine.TWD.total)}
-          linkTo="loan-bank-chart"
-        />
-        <KpiCard
-          icon={<Wallet size={20} color="#fff" />}
-          iconBg="#8B6BF2"
-          label="USD 剩餘可用額度"
-          currency="USD"
-          value={fmtWan(creditLine.USD.available)}
-          unit=""
-          sub="總額度"
-          subValue={"USD " + fmtYi(creditLine.USD.total)}
-          subColor="#F2A93B"
-          linkTo="loan-bank-chart"
-        />
+
+      <div className="chart-row">
+        <LoanTotalCard />
+        <LoanAvailableCard />
       </div>
 
       <div className="chart-row">
@@ -2286,37 +2400,6 @@ function FinancePage() {
 // ---------------------------------------------------------------------------
 // 首頁：現金水位總覽 ＋ 庫存總覽（可點選跳轉）＋ AI 建議
 // ---------------------------------------------------------------------------
-function CashSummaryCard() {
-  const rows = [
-    { label: "TWD", value: fmtWan(cashGroup.TWD.balance), color: "#2E86FF" },
-    { label: "USD", value: fmtWan(cashGroup.USD.balance), color: "#14B8A6" },
-    { label: "JPY", value: fmtWan(cashGroup.JPY.balance), color: "#5DA9E9" },
-  ];
-  return (
-    <div className="kpi-card">
-      <div className="kpi-top">
-        <div className="kpi-icon" style={{ background: "#0B2A4A" }}>
-          <Wallet size={20} color="#fff" />
-        </div>
-        <span className="kpi-label">現金合計（可動用餘額）</span>
-      </div>
-      <div className="cash-summary-rows">
-        {rows.map((r) => (
-          <div className="cash-summary-row" key={r.label}>
-            <span className="cash-summary-dot" style={{ background: r.color }} />
-            <span className="cash-summary-currency">{r.label}</span>
-            <span className="cash-summary-value">{r.value}</span>
-          </div>
-        ))}
-      </div>
-      <div className="kpi-sub">
-        <span className="kpi-sub-label">資料日期</span>
-        <span className="kpi-sub-value">2026/08/04</span>
-      </div>
-    </div>
-  );
-}
-
 function ClickableInventoryDonut({ title, data, totalLabel, totalValue, footer, onClick }) {
   const [hoverIndex, setHoverIndex] = useState(-1);
   return (
@@ -2390,43 +2473,10 @@ function HomePage({ onNavigate }) {
       {/* ---------- 區塊一：現金水位 ---------- */}
       <div className="period-bar">
         <CircleDollarSign size={16} />
-        <span>現金水位・2026/08/04　（資料來源：貿易＋船務資金狀況表）</span>
+        <span>現金水位・2026/08/05　（資料來源：貿易＋船務資金狀況表）</span>
       </div>
       <div className="kpi-grid">
-        <CashSummaryCard />
-        <KpiCard
-          icon={<Wallet size={20} color="#fff" />}
-          iconBg="#14B8A6"
-          label="美金資金水位"
-          currency="USD"
-          value={fmtWan(cashGroup.USD.balance)}
-          unit=""
-          sub="不可動用"
-          subValue={"USD " + fmtWan(cashGroup.USD.restricted)}
-          subColor="#EF6461"
-        />
-        <KpiCard
-          icon={<Wallet size={20} color="#fff" />}
-          iconBg="#2E86FF"
-          label="台幣資金水位"
-          currency="TWD"
-          value={fmtWan(cashGroup.TWD.balance)}
-          unit=""
-          sub="不可動用"
-          subValue={"TWD " + fmtWan(cashGroup.TWD.restricted)}
-          subColor="#EF6461"
-        />
-        <KpiCard
-          icon={<Wallet size={20} color="#fff" />}
-          iconBg="#5DA9E9"
-          label="日幣資金水位"
-          currency="JPY"
-          value={fmtWan(cashGroup.JPY.balance)}
-          unit=""
-          sub="不可動用"
-          subValue={"JPY " + fmtWan(cashGroup.JPY.restricted)}
-          subColor="#EF6461"
-        />
+        <CashAvailableCard title="集團資金水位" />
       </div>
 
       {/* ---------- AI 提醒（現金水位） ---------- */}
@@ -2933,6 +2983,9 @@ const CSS = `
 .kpi-sub{display:flex;justify-content:space-between;margin-top:10px;font-size:12px;
   padding-top:8px;border-top:1px dashed var(--border);}
 .kpi-sub-value{font-family:var(--mono);font-weight:600;}
+.cash-avail-block{margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+.cash-avail-block:first-of-type{margin-top:4px;padding-top:0;border-top:none;}
+.cash-avail-block .kpi-value{margin-bottom:0;}
 .insight-banner{
   display:flex;gap:10px;background:#FFF7E8;border:1px solid #F6DFAE;
   border-radius:13px;padding:13px 16px;font-size:13px;line-height:1.7;
