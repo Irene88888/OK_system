@@ -401,6 +401,20 @@ const dayuInvByWarehouse = [
   { name: "正洋", cost: 512444 },
 ];
 
+// 庫存金額依產品名稱（前10大，依存貨成本加總排序，全部庫存共234項產品）
+const dayuInvByProduct = [
+  { name: "鬼頭刀5上", cost: 6657301 },
+  { name: "韓國活鮑魚", cost: 5170982 },
+  { name: "南方黑鮪40上", cost: 5085460 },
+  { name: "挪威鯖魚400/600", cost: 4068523 },
+  { name: "長鰭鮪10上", cost: 3953688 },
+  { name: "劍旗25上", cost: 3597787 },
+  { name: "黃肌LOIN", cost: 3523393 },
+  { name: "魷魚串150-180g/尾", cost: 3126816 },
+  { name: "水鯊去肚10上", cost: 2668221 },
+  { name: "三摺白帶魚", cost: 2637548 },
+];
+
 // 過期品明細（逾期天數以報表日 2026/07/31 換算）
 const dayuExpiredItems = [
   { name: "豬肉香腸", qty: 372, unit: "包", warehouse: "加工倉", expiry: "2024-02-15", overdueDays: 897, cost: 37434 },
@@ -1554,6 +1568,7 @@ function ConsolidatedOverview() {
 // ---------------------------------------------------------------------------
 function DayuInventory() {
   const warehouseMax = Math.max(...dayuInvByWarehouse.map((w) => w.cost));
+  const productMax = Math.max(...dayuInvByProduct.map((p) => p.cost));
   const levelCounts = dayuNearExpiryItems.reduce((acc, i) => {
     acc[i.level] = (acc[i.level] || 0) + 1;
     return acc;
@@ -1625,10 +1640,9 @@ function DayuInventory() {
         </div>
       </div>
 
-      <div className="chart-row">
-        <div className="panel" id="dayu-category-chart">
-          <div className="panel-title">庫存金額依產品類別</div>
-          <div className="donut-wrap">
+      <div className="panel" id="dayu-category-chart">
+        <div className="panel-title">庫存金額依產品類別</div>
+        <div className="donut-wrap">
             <div className="donut-chart-box">
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
@@ -1673,23 +1687,25 @@ function DayuInventory() {
           </div>
         </div>
 
-        <div className="panel" id="dayu-warehouse-chart">
-          <div className="panel-title">庫存金額依倉庫</div>
-          <div className="opex-bars">
-            {dayuInvByWarehouse.map((w) => (
-              <div className="opex-row" key={w.name}>
-                <span className="opex-name">{w.name}</span>
-                <div className="opex-track">
-                  <div
-                    className="opex-fill"
-                    style={{ width: pct(w.cost, warehouseMax) + "%", background: "#2E86FF" }}
-                  />
-                </div>
-                <span className="opex-value">{fmtWan(w.cost)}</span>
-                <span className="opex-pct">{pct(w.cost, dayuInvSummary.totalCost)}%</span>
+      <div className="panel">
+        <div className="panel-title">
+          庫存金額依產品名稱（前10大項，總額 {fmtWan(dayuInvByProduct.reduce((s, p) => s + p.cost, 0))}，
+          佔總庫存 {pct(dayuInvByProduct.reduce((s, p) => s + p.cost, 0), dayuInvSummary.totalCost)}%）
+        </div>
+        <div className="opex-bars">
+          {dayuInvByProduct.map((p) => (
+            <div className="opex-row" key={p.name}>
+              <span className="opex-name">{p.name}</span>
+              <div className="opex-track">
+                <div
+                  className="opex-fill"
+                  style={{ width: pct(p.cost, productMax) + "%", background: "#2E86FF" }}
+                />
               </div>
-            ))}
-          </div>
+              <span className="opex-value">{fmtWan(p.cost)}</span>
+              <span className="opex-pct">{pct(p.cost, dayuInvSummary.totalCost)}%</span>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -2320,7 +2336,7 @@ function FinancePage() {
 
       <div className="panel" id="loan-bank-chart">
         <div className="panel-title">借款依銀行分布（TWD，由高至低）</div>
-        <ResponsiveContainer width="100%" height={340}>
+        <ResponsiveContainer width="100%" height={480}>
           <BarChart
             data={bankRanked}
             layout="vertical"
@@ -2332,6 +2348,7 @@ function FinancePage() {
               type="category"
               dataKey="name"
               width={110}
+              interval={0}
               tick={{ fontSize: 11.5, fill: "#425466" }}
               axisLine={false}
               tickLine={false}
@@ -2475,7 +2492,7 @@ function HomePage({ onNavigate }) {
         <CircleDollarSign size={16} />
         <span>現金水位・2026/08/05　（資料來源：貿易＋船務資金狀況表）</span>
       </div>
-      <div className="kpi-grid">
+      <div className="flex-card-row">
         <CashAvailableCard title="集團資金水位" />
       </div>
 
@@ -2956,6 +2973,12 @@ const CSS = `
   display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px;
 }
 @media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr);}}
+.flex-card-row{
+  display:flex;flex-wrap:wrap;gap:14px;margin-bottom:14px;
+}
+.flex-card-row > .kpi-card{
+  flex:1 1 320px;max-width:480px;
+}
 .kpi-card{
   background:var(--card);border:1px solid var(--border);border-radius:15px;
   padding:16px 18px;transition:box-shadow 0.15s, border-color 0.15s, transform 0.15s;
