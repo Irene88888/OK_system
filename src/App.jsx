@@ -487,7 +487,7 @@ const shippingInvWeek = {
 };
 
 // ---------------------------------------------------------------------------
-// 真實資料來源：0805-貿易資金.xlsx／0805-船務資金.xlsx（資金狀況表，2026/08/05）
+// 真實資料來源：0806-貿易資金.xlsx／0806-船務資金.xlsx（資金狀況表，2026/08/06）
 // 115_8_3借款表.xlsx（集團借款總表）
 // ---------------------------------------------------------------------------
 function addCash(a, b) {
@@ -502,13 +502,13 @@ function addCash(a, b) {
 
 const cashByDept = {
   trade: {
-    TWD: { prev: 37758648, inflow: 1807065, outflow: 6751923, restricted: 19011150, balance: 13802640 },
-    USD: { prev: 1588720.46, inflow: 0, outflow: 319131.31, restricted: 1050353.49, balance: 219235.66 },
-    JPY: { prev: 148837800, inflow: 0, outflow: 2576630, restricted: 71007646, balance: 75253524 },
+    TWD: { prev: 32813820, inflow: 0, outflow: 11465, restricted: 19011150, balance: 13791205 },
+    USD: { prev: 1269589.15, inflow: 150850.25, outflow: 0, restricted: 1050353.49, balance: 370085.91 },
+    JPY: { prev: 146261170, inflow: 0, outflow: 0, restricted: 71007646, balance: 75253524 },
   },
   shipping: {
-    TWD: { prev: 10769316, inflow: 4272743, outflow: 4980874, restricted: 6258508, balance: 3802677 },
-    USD: { prev: 366949.79, inflow: 0, outflow: 7283.63, restricted: 171377.98, balance: 188288.18 },
+    TWD: { prev: 10061185, inflow: 0, outflow: 0, restricted: 6258508, balance: 3802677 },
+    USD: { prev: 437660.96, inflow: 140000.0, outflow: 264003.17, restricted: 171377.98, balance: 142279.81 },
     JPY: { prev: 351501140, inflow: 0, outflow: 0, restricted: 349920071, balance: 1581069 },
   },
 };
@@ -2254,7 +2254,7 @@ function FinancePage() {
       {/* ---------- 區塊一：資金狀況 ---------- */}
       <div className="period-bar">
         <CircleDollarSign size={16} />
-        <span>資金狀況・2026/08/05　（資料來源：0805-貿易資金.xlsx ＋ 0805-船務資金.xlsx，貿易＋船務合計）</span>
+        <span>資金狀況・2026/08/06　（資料來源：0806-貿易資金.xlsx ＋ 0806-船務資金.xlsx，貿易＋船務合計）</span>
       </div>
 
       <div className="chart-row">
@@ -2513,7 +2513,7 @@ function HomePage({ onNavigate }) {
       {/* ---------- 區塊一：現金水位 ---------- */}
       <div className="period-bar">
         <CircleDollarSign size={16} />
-        <span>現金水位・2026/08/05　（資料來源：貿易＋船務資金狀況表）</span>
+        <span>現金水位・2026/08/06　（資料來源：貿易＋船務資金狀況表）</span>
       </div>
       <div className="flex-card-row">
         <CashAvailableCard title="集團資金水位" />
