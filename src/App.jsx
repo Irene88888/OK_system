@@ -861,8 +861,14 @@ function ShippingPnl() {
             </Bar>
           </BarChart>
         </ResponsiveContainer>
-        <div className="table-wrap">
-          <table>
+        <div className="table-wrap freeze-col1">
+          <table className="fixed-cols">
+            <colgroup>
+              <col style={{ width: "140px" }} />
+              <col style={{ width: "110px" }} />
+              <col style={{ width: "110px" }} />
+              <col style={{ width: "90px" }} />
+            </colgroup>
             <thead>
               <tr>
                 <th className="left">船舶</th>
@@ -1134,7 +1140,7 @@ function MonthlyTrendChart({ data, title }) {
     <div className="panel">
       <div className="panel-title">{title}</div>
       <ResponsiveContainer width="100%" height={280}>
-        <ComposedChart data={data} margin={{ left: 4, right: 8, top: 10, bottom: 4 }}>
+        <ComposedChart data={data} margin={{ left: 4, right: 8, top: 34, bottom: 4 }}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#EEF1F5" />
           <XAxis dataKey="month" tick={{ fontSize: 12, fill: "#425466" }} axisLine={false} tickLine={false} />
           <YAxis yAxisId="rev" hide />
@@ -1223,7 +1229,7 @@ function CompareBarChart({ compare, metric, title, unit }) {
     <div className="panel">
       <div className="panel-title">{title}比較（前期 vs 本期）</div>
       <ResponsiveContainer width="100%" height={220}>
-        <BarChart data={data} margin={{ left: 4, right: 8, top: 20, bottom: 4 }} barGap={4}>
+        <BarChart data={data} margin={{ left: 4, right: 8, top: 20, bottom: 4 }} barGap={10} barCategoryGap="24%">
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#EEF1F5" />
           <XAxis dataKey="name" tick={{ fontSize: 12, fill: "#425466" }} axisLine={false} tickLine={false} />
           <YAxis hide />
@@ -1233,17 +1239,17 @@ function CompareBarChart({ compare, metric, title, unit }) {
             dataKey="prev"
             fill="#B8C2CE"
             radius={[5, 5, 0, 0]}
-            barSize={28}
+            barSize={22}
             isAnimationActive
             animationDuration={800}
             animationEasing="ease-out"
           >
-            <LabelList dataKey="prev" position="top" formatter={(v) => fmtWan(v)} style={{ fontSize: 10, fill: "#8B95A5", fontFamily: "var(--mono)" }} />
+            <LabelList dataKey="prev" position="top" formatter={(v) => fmtWan(v)} style={{ fontSize: 9.5, fill: "#8B95A5", fontFamily: "var(--mono)" }} />
           </Bar>
           <Bar
             dataKey="curr"
             radius={[5, 5, 0, 0]}
-            barSize={28}
+            barSize={22}
             shape={(props) => renderActiveBarVertical(props, active)}
             onMouseEnter={(_, i) => setActive(i)}
             onMouseLeave={() => setActive(-1)}
@@ -1254,7 +1260,7 @@ function CompareBarChart({ compare, metric, title, unit }) {
             {data.map((d, i) => (
               <Cell key={i} fill={d.curr >= d.prev ? "#14B8A6" : "#EF6461"} />
             ))}
-            <LabelList dataKey="curr" position="top" formatter={(v) => fmtWan(v)} style={{ fontSize: 10.5, fontWeight: 700, fill: "#425466", fontFamily: "var(--mono)" }} />
+            <LabelList dataKey="curr" position="top" formatter={(v) => fmtWan(v)} style={{ fontSize: 10, fontWeight: 700, fill: "#425466", fontFamily: "var(--mono)" }} />
           </Bar>
         </BarChart>
       </ResponsiveContainer>
