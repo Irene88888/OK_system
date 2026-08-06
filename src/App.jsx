@@ -1713,8 +1713,16 @@ function DayuInventory() {
         <div className="panel-title">
           過期商品列示（{dayuExpiredItems.length} 筆・依逾期天數排序）
         </div>
-        <div className="table-wrap">
-          <table>
+        <div className="table-wrap freeze-col1">
+          <table className="fixed-cols">
+            <colgroup>
+              <col style={{ width: "130px" }} />
+              <col style={{ width: "90px" }} />
+              <col style={{ width: "90px" }} />
+              <col style={{ width: "90px" }} />
+              <col style={{ width: "80px" }} />
+              <col style={{ width: "90px" }} />
+            </colgroup>
             <thead>
               <tr>
                 <th className="left">品名</th>
@@ -1763,8 +1771,17 @@ function DayuInventory() {
             .join("／")}
           ）
         </div>
-        <div className="table-wrap">
-          <table>
+        <div className="table-wrap freeze-col1">
+          <table className="fixed-cols">
+            <colgroup>
+              <col style={{ width: "130px" }} />
+              <col style={{ width: "90px" }} />
+              <col style={{ width: "90px" }} />
+              <col style={{ width: "90px" }} />
+              <col style={{ width: "80px" }} />
+              <col style={{ width: "70px" }} />
+              <col style={{ width: "90px" }} />
+            </colgroup>
             <thead>
               <tr>
                 <th className="left">品名</th>
@@ -3052,6 +3069,14 @@ const CSS = `
 .legend-pct{font-family:var(--mono);color:var(--muted);font-weight:600;}
 .table-wrap{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:760px;}
+table.fixed-cols{table-layout:fixed;min-width:560px;}
+.freeze-col1 thead th:first-child,
+.freeze-col1 tbody td:first-child,
+.freeze-col1 tfoot td:first-child{
+  position:sticky;left:0;z-index:2;background:var(--card);
+  box-shadow:2px 0 5px -2px rgba(16,24,40,0.10);
+}
+.freeze-col1 thead th:first-child{background:#fff;z-index:3;}
 thead th{
   text-align:right;color:var(--muted);font-weight:600;font-size:11.5px;
   padding:8px 10px;border-bottom:2px solid var(--border);white-space:nowrap;
