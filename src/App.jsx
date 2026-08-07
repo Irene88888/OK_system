@@ -363,29 +363,27 @@ const dayuCompare = {
 const COMPANY_COLORS = ["#2E86FF", "#F2A93B", "#8B6BF2", "#14B8A6", "#EF6461", "#5DA9E9"];
 
 // ---------------------------------------------------------------------------
-// 真實資料來源：OT庫存狀況表0731-大漁.xlsx（大漁倉庫，資料日期 2026/07/31）
+// 真實資料來源：OT庫存狀況表20260806.xlsx（大漁倉庫，資料日期 2026/08/06）
 // ---------------------------------------------------------------------------
 const dayuInvSummary = {
-  reportDate: "2026/07/31",
-  totalQty: 738690.7,
-  totalCost: 84628376,
-  totalItems: 759,
-  normalCost: 71514970,
-  longStorageCost: 11461920,
+  reportDate: "2026/08/06",
+  totalQty: 782646.9,
+  totalCost: 89707032,
+  totalItems: 737,
   expiredCost: 438972,
   expiredItems: 18,
-  nearExpiryCost: 1212517,
-  nearExpiryItems: 34,
+  nearExpiryCost: 1150455,
+  nearExpiryItems: 33,
 };
 
 const dayuInvByCategory = [
-  { name: "魚貨", qty: 409748.4, cost: 42471361, color: "#2E86FF" },
-  { name: "冷凍水產品", qty: 173023.9, cost: 22739582, color: "#5DA9E9" },
-  { name: "加工製品", qty: 81125.1, cost: 13103912, color: "#F2A93B" },
-  { name: "其他", qty: 50483.8, cost: 3186619, color: "#94A3B8" },
-  { name: "貿易部", qty: 11760.0, cost: 2517404, color: "#8B6BF2" },
-  { name: "調味食品", qty: 12219.0, cost: 213407, color: "#14B8A6" },
+  { name: "魚貨", qty: 579376.4, cost: 59996330, color: "#2E86FF" },
+  { name: "冷凍水產品", qty: 106599.8, cost: 19597680, color: "#5DA9E9" },
+  { name: "加工製品", qty: 27452.8, cost: 6576274, color: "#F2A93B" },
+  { name: "其他", qty: 58284.3, cost: 2963447, color: "#94A3B8" },
   { name: "冷凍肉品", qty: 315.6, cost: 393690, color: "#EF6461" },
+  { name: "調味食品", qty: 10603.0, cost: 177210, color: "#14B8A6" },
+  { name: "餌料", qty: 15.0, cost: 2400, color: "#8B6BF2" },
 ];
 
 const dayuInvByWarehouse = [
@@ -403,19 +401,19 @@ const dayuInvByWarehouse = [
 
 // 庫存金額依產品名稱（前10大，依存貨成本加總排序，全部庫存共234項產品）
 const dayuInvByProduct = [
+  { name: "長鰭鮪10上", cost: 19394696 },
   { name: "鬼頭刀5上", cost: 6657301 },
   { name: "韓國活鮑魚", cost: 5170982 },
   { name: "南方黑鮪40上", cost: 5085460 },
+  { name: "劍旗25上", cost: 4108891 },
   { name: "挪威鯖魚400/600", cost: 4068523 },
-  { name: "長鰭鮪10上", cost: 3953688 },
-  { name: "劍旗25上", cost: 3597787 },
-  { name: "黃肌LOIN", cost: 3523393 },
-  { name: "魷魚串150-180g/尾", cost: 3126816 },
-  { name: "水鯊去肚10上", cost: 2668221 },
+  { name: "手釣黃肌WR 20公斤上", cost: 3044790 },
+  { name: "水鯊去肚10上", cost: 2651518 },
   { name: "三摺白帶魚", cost: 2637548 },
+  { name: "生凍櫻花蝦", cost: 2465052 },
 ];
 
-// 過期品明細（逾期天數以報表日 2026/07/31 換算）
+// 過期品明細（逾期天數以報表日 2026/08/06 換算）
 const dayuExpiredItems = [
   { name: "豬肉香腸", qty: 372, unit: "包", warehouse: "加工倉", expiry: "2024-02-15", overdueDays: 897, cost: 37434 },
   { name: "牡蠣肉 2L", qty: 18, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2024-03-17", overdueDays: 866, cost: 8640 },
@@ -439,28 +437,39 @@ const dayuExpiredItems = [
 
 // 即將到期明細（依剩餘天數排序，含四級警示）
 const dayuNearExpiryItems = [
-  { name: "干貝2S", qty: 0.75, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-08-21", daysLeft: 21, level: "緊急", cost: 1275 },
-  { name: "海菜吻仔魚湯料盒", qty: 22, unit: "盒", warehouse: "正洋", expiry: "2026-09-09", daysLeft: 40, level: "警示", cost: 1430 },
-  { name: "黑鮪大腹肉", qty: 0.29, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-09-30", daysLeft: 61, level: "警示", cost: 303 },
-  { name: "黃肌STEAK", qty: 980, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-10", daysLeft: 71, level: "警示", cost: 119149 },
-  { name: "鮪魚黑肉", qty: 1390, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-10", daysLeft: 71, level: "警示", cost: 44473 },
-  { name: "冷凍去殼帶尾甜蝦150g", qty: 17, unit: "包", warehouse: "正洋", expiry: "2026-10-17", daysLeft: 78, level: "警示", cost: 3060 },
-  { name: "鮭魚6/7", qty: 19.4, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-18", daysLeft: 79, level: "警示", cost: 5807 },
-  { name: "黃肌LOIN", qty: 737, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-19", daysLeft: 80, level: "警示", cost: 89605 },
-  { name: "劍旗碎肉", qty: 120, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-19", daysLeft: 80, level: "警示", cost: 9982 },
-  { name: "旗魚碎肉", qty: 575, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-19", daysLeft: 80, level: "警示", cost: 19412 },
-  { name: "臭肉魚絲(沙丁魚干)", qty: 2, unit: "包", warehouse: "正洋", expiry: "2026-10-22", daysLeft: 83, level: "警示", cost: 104 },
-  { name: "黑鮪大腹肉", qty: 121.04, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-31", daysLeft: 92, level: "注意", cost: 118172 },
-  { name: "黑輪片", qty: 65, unit: "包", warehouse: "正洋", expiry: "2026-10-31", daysLeft: 92, level: "注意", cost: 4307 },
-  { name: "魚鬆捲心酥", qty: 7565, unit: "隻", warehouse: "正洋", expiry: "2026-11-12", daysLeft: 104, level: "注意", cost: 53564 },
-  { name: "白鯧900/1000", qty: 47.29, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-11-13", daysLeft: 105, level: "注意", cost: 46344 },
-  { name: "生凍櫻花蝦", qty: 905, unit: "公斤", warehouse: "海和", expiry: "2026-11-13", daysLeft: 105, level: "注意", cost: 357209 },
-  { name: "生凍櫻花蝦", qty: 124.5, unit: "公斤", warehouse: "海和", expiry: "2026-11-17", daysLeft: 109, level: "注意", cost: 50315 },
-  { name: "大比目魚切片35P", qty: 1.6, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-11-30", daysLeft: 122, level: "注意", cost: 706 },
-  { name: "圓鱈10/15", qty: 25.9, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-12-10", daysLeft: 132, level: "注意", cost: 37555 },
-  { name: "圓鱈10/15", qty: 40.85, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-12-10", daysLeft: 132, level: "注意", cost: 59232 },
-  { name: "圓鱈", qty: 29.07, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-12-11", daysLeft: 133, level: "注意", cost: 40696 },
-  { name: "圓鱈", qty: 24.05, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-12-12", daysLeft: 134, level: "注意", cost: 33670 },
+  { name: "海菜吻仔魚湯料盒", qty: 22, unit: "盒", warehouse: "正洋", expiry: "2026-09-09", daysLeft: 34, level: "警示", cost: 1430 },
+  { name: "黑鮪大腹肉", qty: 0.29, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-09-30", daysLeft: 55, level: "警示", cost: 303 },
+  { name: "黃肌STEAK", qty: 980, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-10", daysLeft: 65, level: "警示", cost: 119149 },
+  { name: "鮪魚黑肉", qty: 1390, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-10", daysLeft: 65, level: "警示", cost: 44473 },
+  { name: "冷凍去殼帶尾甜蝦150g", qty: 17, unit: "包", warehouse: "正洋", expiry: "2026-10-17", daysLeft: 72, level: "警示", cost: 3060 },
+  { name: "鮭魚6/7", qty: 19.4, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-18", daysLeft: 73, level: "警示", cost: 5807 },
+  { name: "黃肌LOIN", qty: 737, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-19", daysLeft: 74, level: "警示", cost: 89605 },
+  { name: "劍旗碎肉", qty: 120, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-19", daysLeft: 74, level: "警示", cost: 9982 },
+  { name: "旗魚碎肉", qty: 575, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-19", daysLeft: 74, level: "警示", cost: 19412 },
+  { name: "臭肉魚絲(沙丁魚干)", qty: 2, unit: "包", warehouse: "正洋", expiry: "2026-10-22", daysLeft: 77, level: "警示", cost: 104 },
+  { name: "黑鮪大腹肉", qty: 84.97, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-31", daysLeft: 86, level: "警示", cost: 82956 },
+  { name: "黑輪片", qty: 65, unit: "包", warehouse: "正洋", expiry: "2026-10-31", daysLeft: 86, level: "警示", cost: 4307 },
+  { name: "魚鬆捲心酥", qty: 6913, unit: "隻", warehouse: "正洋", expiry: "2026-11-12", daysLeft: 98, level: "注意", cost: 48948 },
+  { name: "白鯧900/1000", qty: 47.29, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-11-13", daysLeft: 99, level: "注意", cost: 46344 },
+  { name: "生凍櫻花蝦", qty: 905, unit: "公斤", warehouse: "海和", expiry: "2026-11-13", daysLeft: 99, level: "注意", cost: 357209 },
+  { name: "生凍櫻花蝦", qty: 124.5, unit: "公斤", warehouse: "海和", expiry: "2026-11-17", daysLeft: 103, level: "注意", cost: 50315 },
+  { name: "生凍櫻花蝦", qty: 0.01, unit: "公斤", warehouse: "海和", expiry: "2026-11-27", daysLeft: 113, level: "注意", cost: 4 },
+  { name: "大比目魚切片35P", qty: 1.6, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-11-30", daysLeft: 116, level: "注意", cost: 706 },
+  { name: "火燒蝦仁(包)", qty: 1, unit: "包", warehouse: "正洋", expiry: "2026-12-01", daysLeft: 117, level: "注意", cost: 85 },
+  { name: "土魠切片(澎湖手釣)", qty: 1, unit: "包", warehouse: "正洋", expiry: "2026-12-01", daysLeft: 117, level: "注意", cost: 200 },
+  { name: "圓鱈10/15", qty: 25.9, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-12-10", daysLeft: 126, level: "注意", cost: 37555 },
+  { name: "圓鱈10/15", qty: 40.85, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-12-10", daysLeft: 126, level: "注意", cost: 59232 },
+  { name: "圓鱈", qty: 29.07, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-12-11", daysLeft: 127, level: "注意", cost: 40696 },
+  { name: "圓鱈10/15", qty: 1.3, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-12-11", daysLeft: 127, level: "注意", cost: 1885 },
+  { name: "圓鱈", qty: 24.05, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-12-12", daysLeft: 128, level: "注意", cost: 33670 },
+  { name: "圓鱈10/15", qty: 11.05, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-12-12", daysLeft: 128, level: "注意", cost: 18233 },
+  { name: "鮭魚碎肉", qty: 15, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-12-16", daysLeft: 132, level: "注意", cost: 3000 },
+  { name: "生凍櫻花蝦", qty: 2.67, unit: "公斤", warehouse: "海和", expiry: "2026-12-18", daysLeft: 134, level: "注意", cost: 1302 },
+  { name: "圓鱈15/20", qty: 17.14, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2027-01-07", daysLeft: 154, level: "注意", cost: 23139 },
+  { name: "生凍櫻花蝦", qty: 5.1, unit: "公斤", warehouse: "海和", expiry: "2027-01-22", daysLeft: 169, level: "注意", cost: 2318 },
+  { name: "熟白蝦30/40", qty: 1, unit: "盒", warehouse: "-35度冷凍庫", expiry: "2027-01-24", daysLeft: 171, level: "注意", cost: 430 },
+  { name: "魷魚一夜干(280G 上)", qty: 214, unit: "尾", warehouse: "-35度冷凍庫", expiry: "2027-02-03", daysLeft: 181, level: "追蹤", cost: 18190 },
+  { name: "生凍櫻花蝦", qty: 55.91, unit: "公斤", warehouse: "海和", expiry: "2027-02-09", daysLeft: 187, level: "追蹤", cost: 26406 },
 ];
 
 const EXPIRY_LEVEL_COLOR = {
@@ -1586,7 +1595,7 @@ function DayuInventory() {
       <div className="period-bar">
         <Warehouse size={16} />
         <span>
-          大漁庫存・資料日期 {dayuInvSummary.reportDate}　（資料來源：OT庫存狀況表0731-大漁.xlsx，每週四更新）
+          大漁庫存・資料日期 {dayuInvSummary.reportDate}　（資料來源：OT庫存狀況表20260806.xlsx，每週四更新）
         </span>
       </div>
 
@@ -1640,9 +1649,9 @@ function DayuInventory() {
         <div>
           <b>過期品共 {dayuInvSummary.expiredItems} 筆、金額 {fmtWan(dayuInvSummary.expiredCost)} 元</b>
           ，尚未處理報廢或折讓，建議優先清查；其中「豬肉香腸」「牡蠣肉2L」逾期已超過
-          <b> 800 天</b>，長期占用冷凍庫容量。另有 <b>{dayuInvSummary.nearExpiryItems} 筆、
-          {fmtWan(dayuInvSummary.nearExpiryCost)} 元</b>商品將於未來 6 個月內到期，其中「干貝2S」
-          僅剩 21 天為緊急等級，需優先促銷或調撥。
+          <b> 900 天</b>，長期占用冷凍庫容量。另有 <b>{dayuInvSummary.nearExpiryItems} 筆、
+          {fmtWan(dayuInvSummary.nearExpiryCost)} 元</b>商品將於未來 6 個月內到期，其中「海菜吻仔魚湯料盒」
+          僅剩 34 天為最接近到期的品項，需優先促銷或調撥。
         </div>
       </div>
 
@@ -2554,7 +2563,7 @@ function HomePage({ onNavigate }) {
         <ul className="ai-reminder-list">
           <li>
             <b>大漁庫存有 {dayuInvSummary.expiredItems} 筆商品已過期</b>（金額 {fmtWan(dayuInvSummary.expiredCost)} 元），
-            另有 {dayuInvSummary.nearExpiryItems} 筆將於 6 個月內到期，建議優先處理「干貝2S」等緊急等級品項。
+            另有 {dayuInvSummary.nearExpiryItems} 筆將於 6 個月內到期，建議優先處理「海菜吻仔魚湯料盒」等最接近到期的品項。
           </li>
           <li>
             <b>船務本週（{shippingInvWeek.period}）總漁獲量 {fmt(shipQtyTotal)} 公斤</b>，
