@@ -496,8 +496,8 @@ const shippingInvWeek = {
 };
 
 // ---------------------------------------------------------------------------
-// 真實資料來源：0806-貿易資金.xlsx／0806-船務資金.xlsx（資金狀況表，2026/08/06）
-// 115_8_3借款表.xlsx（集團借款總表）
+// 真實資料來源：0810-貿易資金.xlsx／0810-船務資金.xlsx（資金狀況表，2026/08/10）
+// 115_8_10.xlsx（集團借款總表）
 // ---------------------------------------------------------------------------
 function addCash(a, b) {
   return {
@@ -511,14 +511,14 @@ function addCash(a, b) {
 
 const cashByDept = {
   trade: {
-    TWD: { prev: 32813820, inflow: 0, outflow: 11465, restricted: 19011150, balance: 13791205 },
-    USD: { prev: 1269589.15, inflow: 150850.25, outflow: 0, restricted: 1050353.49, balance: 370085.91 },
+    TWD: { prev: 28669548, inflow: 1019384, outflow: 796695, restricted: 19011150, balance: 9881087 },
+    USD: { prev: 1717219.4, inflow: 0, outflow: 204903.86, restricted: 1050353.49, balance: 461962.05 },
     JPY: { prev: 146261170, inflow: 0, outflow: 0, restricted: 71007646, balance: 75253524 },
   },
   shipping: {
-    TWD: { prev: 10061185, inflow: 0, outflow: 0, restricted: 6258508, balance: 3802677 },
-    USD: { prev: 437660.96, inflow: 140000.0, outflow: 264003.17, restricted: 171377.98, balance: 142279.81 },
-    JPY: { prev: 351501140, inflow: 0, outflow: 0, restricted: 349920071, balance: 1581069 },
+    TWD: { prev: 9958263, inflow: 2078000, outflow: 2056939, restricted: 4227682, balance: 5751642 },
+    USD: { prev: 312849.21, inflow: 200000.0, outflow: 5557.03, restricted: 171377.98, balance: 335914.2 },
+    JPY: { prev: 402568721, inflow: 0, outflow: 0, restricted: 349920071, balance: 52648650 },
   },
 };
 
@@ -529,14 +529,14 @@ const cashGroup = {
 };
 
 const loanTotals = {
-  shipping: { TWD: 140063945, USD: 9638252.71, JPY: 0, EUR: 30000 },
-  trade: { TWD: 589320584, USD: 7495492.6, JPY: 30652760, EUR: 0 },
-  group: { TWD: 729384529, USD: 17133745.31, JPY: 30652760, EUR: 30000 },
+  shipping: { TWD: 140063945, USD: 9714364.71, JPY: 0, EUR: 30000 },
+  trade: { TWD: 589320584, USD: 7410426.7, JPY: 81724301, EUR: 0 },
+  group: { TWD: 729384529, USD: 17124791.41, JPY: 81724301, EUR: 30000 },
 };
 
 const loanByYear = [
-  { year: "2026", TWD: 323546660, USD: 15857180.31 },
-  { year: "2027", TWD: 62577927, USD: 1276565.0 },
+  { year: "2026", TWD: 323546660, USD: 15753726.41 },
+  { year: "2027", TWD: 62577927, USD: 1371065.0 },
   { year: "2028", TWD: 8802480, USD: 0 },
   { year: "2029", TWD: 15798765, USD: 0 },
   { year: "2031", TWD: 231480611, USD: 0 },
@@ -545,9 +545,9 @@ const loanByYear = [
 ];
 
 const loanByBank = [
-  { name: "中國信託", TWD: 190000000, USD: 1493923.17 },
+  { name: "中國信託", TWD: 190000000, USD: 1314357.27 },
   { name: "華南銀行/博愛", TWD: 123844752, USD: 2808537.5 },
-  { name: "元大銀行", TWD: 88730611, USD: 3757863.75 },
+  { name: "元大銀行", TWD: 88730611, USD: 3833975.75 },
   { name: "第一銀行", TWD: 68380407, USD: 900000 },
   { name: "台中商銀", TWD: 54000000, USD: 0 },
   { name: "合作金庫(票券)", TWD: 50000000, USD: 0 },
@@ -556,7 +556,7 @@ const loanByBank = [
   { name: "合作金庫(十全)", TWD: 26000000, USD: 0 },
   { name: "台新銀行", TWD: 25000000, USD: 0 },
   { name: "合作金庫(港都)", TWD: 12545462, USD: 895000 },
-  { name: "兆豐商銀", TWD: 9996660, USD: 1398031.93 },
+  { name: "兆豐商銀", TWD: 9996660, USD: 1492531.93 },
   { name: "三信商業銀行", TWD: 9300000, USD: 0 },
   { name: "新光銀行", TWD: 3253303, USD: 1938168.07 },
   { name: "台北富邦", TWD: 0, USD: 2468528.04 },
@@ -565,7 +565,7 @@ const loanByBank = [
 
 const creditLine = {
   TWD: { total: 625000000, used: 414574587, available: 210425413 },
-  USD: { total: 19300000, used: 17364313.02, available: 1935686.98 },
+  USD: { total: 19300000, used: 17675887.43, available: 1624112.57 },
 };
 
 // ---------------------------------------------------------------------------
@@ -2263,7 +2263,7 @@ function FinancePage() {
       {/* ---------- 區塊一：資金狀況 ---------- */}
       <div className="period-bar">
         <CircleDollarSign size={16} />
-        <span>資金狀況・2026/08/06　（資料來源：0806-貿易資金.xlsx ＋ 0806-船務資金.xlsx，貿易＋船務合計）</span>
+        <span>資金狀況・2026/08/10　（資料來源：0810-貿易資金.xlsx ＋ 0810-船務資金.xlsx，貿易＋船務合計）</span>
       </div>
 
       <div className="chart-row">
@@ -2302,7 +2302,7 @@ function FinancePage() {
       {/* ---------- 區塊二：借款總表 ---------- */}
       <div className="period-bar" style={{ marginTop: 6 }}>
         <Landmark size={16} />
-        <span>借款總表・截至 2026/08/03　（資料來源：115_8_3借款表.xlsx）</span>
+        <span>借款總表・截至 2026/08/10　（資料來源：115_8_10.xlsx）</span>
       </div>
 
 
@@ -2522,7 +2522,7 @@ function HomePage({ onNavigate }) {
       {/* ---------- 區塊一：現金水位 ---------- */}
       <div className="period-bar">
         <CircleDollarSign size={16} />
-        <span>現金水位・2026/08/06　（資料來源：貿易＋船務資金狀況表）</span>
+        <span>現金水位・2026/08/10　（資料來源：貿易＋船務資金狀況表）</span>
       </div>
       <div className="flex-card-row">
         <CashAvailableCard title="集團資金水位" />
