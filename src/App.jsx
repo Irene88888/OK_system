@@ -57,7 +57,7 @@ const BROADCAST_CONFIG = {
   // 跟 wrangler secret put BROADCAST_API_KEY 設定的同一組值
   apiKey: "OKgroup2026-Ln9xR7vQ3mZp8",
   // 你的 GitHub Pages 網址，會放進 LINE 訊息卡片的「查看完整儀表板」按鈕連結
-  dashboardUrl: "https://your-org.github.io/OK_system/",
+  dashboardUrl: "https://irene88888.github.io/OK_system/",
 };
 
 // 推播按鈕：呼叫 Cloudflare Worker，轉發訊息給 LINE 官方帳號所有好友
