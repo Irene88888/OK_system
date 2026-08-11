@@ -39,7 +39,98 @@ import {
   Building2,
   CircleDollarSign,
   LogOut,
+  FileText,
+  Printer,
+  ArrowLeft,
+  Send,
+  Loader2,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
+
+// ---------------------------------------------------------------------------
+// LINE 推播設定
+// ---------------------------------------------------------------------------
+const BROADCAST_CONFIG = {
+  // 部署完成後拿到的 Cloudflare Worker 網址（結尾不要加 /broadcast，元件會自動補上）
+  workerUrl: "https://ocean-king-line-broadcast.oceankinggroup.workers.dev",
+  // 跟 wrangler secret put BROADCAST_API_KEY 設定的同一組值
+  apiKey: "OKgroup2026-Ln9xR7vQ3mZp8",
+  // 你的 GitHub Pages 網址，會放進 LINE 訊息卡片的「查看完整儀表板」按鈕連結
+  dashboardUrl: "https://your-org.github.io/OK_system/",
+};
+
+// 推播按鈕：呼叫 Cloudflare Worker，轉發訊息給 LINE 官方帳號所有好友
+function BroadcastButton({ label, buildPayload }) {
+  const [status, setStatus] = useState("idle"); // idle | sending | success | error
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const handleClick = async () => {
+    if (status === "sending") return;
+    setStatus("sending");
+    setErrorMsg("");
+    try {
+      const res = await fetch(`${BROADCAST_CONFIG.workerUrl}/broadcast`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Api-Key": BROADCAST_CONFIG.apiKey,
+        },
+        body: JSON.stringify(buildPayload()),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `HTTP ${res.status}`);
+      }
+      setStatus("success");
+    } catch (e) {
+      setStatus("error");
+      setErrorMsg(e.message || "發送失敗");
+    } finally {
+      setTimeout(() => setStatus("idle"), 3500);
+    }
+  };
+
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 10, flexWrap: "wrap" }}>
+      <style>{`@keyframes broadcast-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+      <button
+        onClick={handleClick}
+        disabled={status === "sending"}
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 6,
+          padding: "8px 16px",
+          borderRadius: 8,
+          border: "none",
+          background: status === "sending" ? "#94A3B8" : "#06C755",
+          color: "#fff",
+          fontSize: 14,
+          fontWeight: 600,
+          cursor: status === "sending" ? "default" : "pointer",
+        }}
+      >
+        {status === "sending" ? (
+          <Loader2 size={16} style={{ animation: "broadcast-spin 0.8s linear infinite" }} />
+        ) : (
+          <Send size={16} />
+        )}
+        {status === "sending" ? "發送中…" : label}
+      </button>
+      {status === "success" && (
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "#06C755", fontSize: 13 }}>
+          <CheckCircle2 size={15} /> 已發送給所有好友
+        </span>
+      )}
+      {status === "error" && (
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "#EF6461", fontSize: 13 }}>
+          <XCircle size={15} /> 發送失敗：{errorMsg}
+        </span>
+      )}
+    </div>
+  );
+}
 
 // ---------------------------------------------------------------------------
 // 真實資料來源：202606FS.xlsx／船務部 2026/06 損益表
@@ -1599,6 +1690,24 @@ function DayuInventory() {
         </span>
       </div>
 
+      <BroadcastButton
+        label="發送大漁庫存週報推播"
+        buildPayload={() => ({
+          type: "weekly_inventory",
+          data: {
+            title: "大漁庫存週報",
+            weekLabel: dayuInvSummary.reportDate + " 更新",
+            metrics: [
+              { label: "庫存總數量", value: fmt(dayuInvSummary.totalQty) + " (公斤/件)" },
+              { label: "庫存總金額", value: "NT$ " + fmtWan(dayuInvSummary.totalCost) },
+              { label: "過期品金額", value: "NT$ " + fmtWan(dayuInvSummary.expiredCost) + "（" + dayuInvSummary.expiredItems + " 筆）" },
+              { label: "即將到期金額", value: "NT$ " + fmtWan(dayuInvSummary.nearExpiryCost) + "（" + dayuInvSummary.nearExpiryItems + " 筆）" },
+            ],
+            dashboardUrl: BROADCAST_CONFIG.dashboardUrl,
+          },
+        })}
+      />
+
       <div className="kpi-grid">
         <KpiCard
           icon={<Package size={20} color="#fff" />}
@@ -1866,6 +1975,24 @@ function ShippingInventory() {
           船務庫存（在船漁獲）・{shippingInvWeek.period}　（資料來源：豐展漁業週報 email，每週二更新）
         </span>
       </div>
+
+      <BroadcastButton
+        label="發送船務庫存週報推播"
+        buildPayload={() => ({
+          type: "weekly_inventory",
+          data: {
+            title: "船務庫存週報",
+            weekLabel: shippingInvWeek.period,
+            metrics: [
+              { label: "本週總漁獲量", value: fmt(shippingInvWeek.total.catchKg) + " 公斤" },
+              { label: "ACR 預估收入", value: "US$ " + fmtWan(shippingInvWeek.total.acrUSD) },
+              { label: "超低溫預估收入", value: "¥ " + fmtWan(shippingInvWeek.total.cryoJPY) },
+              { label: "劍旗預估收入", value: "US$ " + fmtWan(shippingInvWeek.total.swordUSD) },
+            ],
+            dashboardUrl: BROADCAST_CONFIG.dashboardUrl,
+          },
+        })}
+      />
 
       <div className="kpi-grid">
         <KpiCard
@@ -2271,6 +2398,20 @@ function FinancePage() {
         <NetCashFlowCard />
       </div>
 
+      <BroadcastButton
+        label="發送每日現金水位推播"
+        buildPayload={() => ({
+          type: "daily_cash",
+          data: {
+            date: new Date().toLocaleDateString("zh-TW"),
+            twd: "NT$ " + fmtWan(cashGroup.TWD.balance),
+            usd: "US$ " + fmtWan(cashGroup.USD.balance),
+            jpy: "¥ " + fmtWan(cashGroup.JPY.balance),
+            dashboardUrl: BROADCAST_CONFIG.dashboardUrl,
+          },
+        })}
+      />
+
       <div className="panel">
         <div className="panel-title">各幣別資金可動用比例</div>
         <div className="mini-donut-row">
@@ -2619,6 +2760,194 @@ const INVENTORY_TABS = [
   { key: "shipping", label: "船務庫存" },
 ];
 
+// ---------------------------------------------------------------------------
+// 一頁式報告：彙整集團損益／資金／借款／庫存重點，供列印或匯出 PDF
+// ---------------------------------------------------------------------------
+function ReportPage({ onBack }) {
+  const genTime = new Date().toLocaleString("zh-TW", { hour12: false });
+  const groupRevenue = tradeCumulative.revenue + dayuCumulative.revenue + fleetTotal.revenue;
+  const groupGrossProfit = tradeCumulative.grossProfit + dayuCumulative.grossProfit + fleetTotal.grossProfit;
+  const groupPretax = tradeCumulative.pretax + dayuCumulative.pretax + fleetTotal.currentPeriodProfit;
+
+  return (
+    <div className="report-screen">
+      <div className="report-toolbar no-print">
+        <button className="report-back-btn" onClick={onBack}>
+          <ArrowLeft size={15} />
+          返回儀表板
+        </button>
+        <button className="report-print-btn" onClick={() => window.print()}>
+          <Printer size={15} />
+          列印／匯出 PDF
+        </button>
+      </div>
+
+      <div className="report-page">
+        <div className="report-header">
+          <div>
+            <div className="report-title">Ocean King Group</div>
+            <div className="report-subtitle">集團經營管理一頁式報告</div>
+          </div>
+          <div className="report-meta">
+            <div>報告產生時間：{genTime}</div>
+            <div>單位：新台幣元（TWD），另有 USD／JPY 標註處除外</div>
+          </div>
+        </div>
+
+        <div className="report-grid">
+          <div className="report-section">
+            <div className="report-section-title">集團損益（2026年1–6月累計）</div>
+            <table className="report-table">
+              <thead>
+                <tr>
+                  <th className="left">事業群</th>
+                  <th>營業收入</th>
+                  <th>營業毛利</th>
+                  <th>稅前／最終損益</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="left">貿易</td>
+                  <td>{fmtWan(tradeCumulative.revenue)}</td>
+                  <td>{fmtWan(tradeCumulative.grossProfit)}</td>
+                  <td className={tradeCumulative.pretax < 0 ? "neg" : "pos"}>{fmtWan(tradeCumulative.pretax)}</td>
+                </tr>
+                <tr>
+                  <td className="left">大漁</td>
+                  <td>{fmtWan(dayuCumulative.revenue)}</td>
+                  <td>{fmtWan(dayuCumulative.grossProfit)}</td>
+                  <td className={dayuCumulative.pretax < 0 ? "neg" : "pos"}>{fmtWan(dayuCumulative.pretax)}</td>
+                </tr>
+                <tr>
+                  <td className="left">船務（最終損益）</td>
+                  <td>{fmtWan(fleetTotal.revenue)}</td>
+                  <td>{fmtWan(fleetTotal.grossProfit)}</td>
+                  <td className={fleetTotal.currentPeriodProfit < 0 ? "neg" : "pos"}>{fmtWan(fleetTotal.currentPeriodProfit)}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td className="left">集團合計</td>
+                  <td>{fmtWan(groupRevenue)}</td>
+                  <td>{fmtWan(groupGrossProfit)}</td>
+                  <td className={groupPretax < 0 ? "neg" : "pos"}>{fmtWan(groupPretax)}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div className="report-section">
+            <div className="report-section-title">集團資金水位（2026/08/10）</div>
+            <table className="report-table">
+              <thead>
+                <tr>
+                  <th className="left">幣別</th>
+                  <th>可動用餘額</th>
+                  <th>不可動用</th>
+                </tr>
+              </thead>
+              <tbody>
+                {["TWD", "USD", "JPY"].map((cur) => (
+                  <tr key={cur}>
+                    <td className="left">{cur}</td>
+                    <td className="pos">{fmtWan(cashGroup[cur].balance)}</td>
+                    <td className="neg">{fmtWan(cashGroup[cur].restricted)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="report-section">
+            <div className="report-section-title">借款總表（截至 2026/08/10）</div>
+            <table className="report-table">
+              <thead>
+                <tr>
+                  <th className="left">幣別</th>
+                  <th>借款總額</th>
+                  <th>剩餘可用額度</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="left">TWD</td>
+                  <td>{fmtWan(loanTotals.group.TWD)}</td>
+                  <td>{fmtWan(creditLine.TWD.available)}</td>
+                </tr>
+                <tr>
+                  <td className="left">USD</td>
+                  <td>{fmtWan(loanTotals.group.USD)}</td>
+                  <td>{fmtWan(creditLine.USD.available)}</td>
+                </tr>
+                <tr>
+                  <td className="left">JPY</td>
+                  <td>{fmtWan(loanTotals.group.JPY)}</td>
+                  <td>—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className="report-section">
+            <div className="report-section-title">庫存重點</div>
+            <table className="report-table">
+              <thead>
+                <tr>
+                  <th className="left">項目</th>
+                  <th>筆數／數量</th>
+                  <th>金額</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="left">大漁庫存總額（{dayuInvSummary.reportDate}）</td>
+                  <td>{dayuInvSummary.totalItems} 筆</td>
+                  <td>{fmtWan(dayuInvSummary.totalCost)}</td>
+                </tr>
+                <tr>
+                  <td className="left">大漁過期品</td>
+                  <td>{dayuInvSummary.expiredItems} 筆</td>
+                  <td className="neg">{fmtWan(dayuInvSummary.expiredCost)}</td>
+                </tr>
+                <tr>
+                  <td className="left">大漁即將到期</td>
+                  <td>{dayuInvSummary.nearExpiryItems} 筆</td>
+                  <td className="neg">{fmtWan(dayuInvSummary.nearExpiryCost)}</td>
+                </tr>
+                <tr>
+                  <td className="left">船務週漁獲量（{shippingInvWeek.period}）</td>
+                  <td>{fmt(shippingInvWeek.total.catchKg)} 公斤</td>
+                  <td>—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="report-section report-highlights">
+          <div className="report-section-title">重點提醒</div>
+          <ul>
+            <li>
+              USD 授信額度已使用 {pct(creditLine.USD.used, creditLine.USD.total)}%，剩餘可用額度僅 {fmt(creditLine.USD.available)} USD，建議近期美金付款前先確認調度來源。
+            </li>
+            <li>
+              大漁庫存有 {dayuInvSummary.expiredItems} 筆商品已過期（{fmtWan(dayuInvSummary.expiredCost)} 元），另有 {dayuInvSummary.nearExpiryItems} 筆將於 6 個月內到期，建議優先處理最接近到期的品項。
+            </li>
+            <li>
+              船務最終損益（累計，含預估收入不含折舊）為 {fmtWan(fleetTotal.currentPeriodProfit)}，貿易累計稅前損益 {fmtWan(tradeCumulative.pretax)}，大漁累計稅前損益 {fmtWan(dayuCumulative.pretax)}。
+            </li>
+          </ul>
+        </div>
+
+        <div className="report-footer">
+          本報告由集團經營管理儀表板自動彙整現有資料產生，僅供內部參考，正式決策請以各部門覆核數字為準。
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Dashboard() {
   const [nav, setNav] = useState("home");
   const [pnlTab, setPnlTab] = useState("consolidated");
@@ -2660,11 +2989,17 @@ function Dashboard() {
               </button>
             );
           })}
+          <button className="topnav-item topnav-report-btn" onClick={() => setNav("report")}>
+            <FileText size={15} />
+            產生報告
+          </button>
         </nav>
       </header>
 
       <main className="main">
-        {nav === "home" ? (
+        {nav === "report" ? (
+          <ReportPage onBack={() => setNav("home")} />
+        ) : nav === "home" ? (
           <HomePage onNavigate={handleNavigate} />
         ) : nav === "finance" ? (
           <FinancePage />
@@ -3295,4 +3630,65 @@ tfoot td.left{text-align:left;font-family:inherit;}
   transition:transform 0.15s,background 0.15s;
 }
 .logout-btn:hover{background:rgba(8,20,40,1);transform:translateY(-1px);}
+.topnav-report-btn{
+  margin-left:auto;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.16) !important;
+}
+.report-screen{min-height:100vh;background:var(--bg);padding:20px;}
+.report-toolbar{
+  max-width:820px;margin:0 auto 14px;display:flex;justify-content:space-between;gap:10px;
+}
+.report-back-btn,.report-print-btn{
+  display:flex;align-items:center;gap:6px;border-radius:9px;padding:9px 16px;font-size:13px;
+  font-weight:600;cursor:pointer;font-family:inherit;border:1px solid var(--border);
+}
+.report-back-btn{background:#fff;color:var(--text);}
+.report-back-btn:hover{border-color:#BFD6EE;}
+.report-print-btn{background:linear-gradient(135deg,#2E86FF,#22D3EE);color:#fff;border:none;
+  box-shadow:0 8px 20px -8px rgba(46,134,255,0.5);}
+.report-print-btn:hover{transform:translateY(-1px);}
+.report-page{
+  max-width:820px;margin:0 auto;background:#fff;border-radius:14px;border:1px solid var(--border);
+  padding:32px 36px;box-shadow:0 1px 2px rgba(16,24,40,0.04),0 12px 28px -18px rgba(16,24,40,0.20);
+}
+.report-header{
+  display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
+  border-bottom:2px solid var(--navy);padding-bottom:14px;margin-bottom:20px;
+}
+.report-title{font-family:var(--display);font-weight:700;font-size:22px;color:var(--navy);}
+.report-subtitle{font-size:13px;color:var(--muted);margin-top:2px;}
+.report-meta{font-size:11px;color:var(--muted);text-align:right;line-height:1.7;}
+.report-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+@media(max-width:640px){.report-grid{grid-template-columns:1fr;}}
+.report-section{margin-bottom:18px;}
+.report-section-title{
+  font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px;
+  padding-bottom:4px;border-bottom:1px solid var(--border);
+}
+.report-table{width:100%;border-collapse:collapse;font-size:11.5px;}
+.report-table th{
+  text-align:right;color:var(--muted);font-weight:600;padding:5px 6px;
+  border-bottom:1px solid var(--border);font-size:10.5px;
+}
+.report-table th.left{text-align:left;}
+.report-table td{
+  text-align:right;padding:6px;font-family:var(--mono);border-bottom:1px solid #F1F5F9;color:var(--text);
+}
+.report-table td.left{text-align:left;font-family:inherit;}
+.report-table tfoot td{font-weight:700;border-top:1.5px solid var(--text);border-bottom:none;}
+.report-highlights ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;}
+.report-highlights li{font-size:11.5px;line-height:1.6;color:var(--text);}
+.report-footer{
+  margin-top:16px;padding-top:12px;border-top:1px dashed var(--border);
+  font-size:10.5px;color:var(--muted);text-align:center;
+}
+@media print{
+  .no-print{display:none !important;}
+  .topbar{display:none !important;}
+  .logout-btn{display:none !important;}
+  .report-screen{background:#fff;padding:0;}
+  .report-page{
+    max-width:100%;border:none;box-shadow:none;border-radius:0;padding:0;margin:0;
+  }
+  @page{size:A4;margin:14mm;}
+}
 `;
