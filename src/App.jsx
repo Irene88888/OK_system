@@ -39,9 +39,6 @@ import {
   Building2,
   CircleDollarSign,
   LogOut,
-  FileText,
-  Printer,
-  ArrowLeft,
   Send,
   Loader2,
   CheckCircle2,
@@ -454,113 +451,113 @@ const dayuCompare = {
 const COMPANY_COLORS = ["#2E86FF", "#F2A93B", "#8B6BF2", "#14B8A6", "#EF6461", "#5DA9E9"];
 
 // ---------------------------------------------------------------------------
-// 真實資料來源：OT庫存狀況表20260806.xlsx（大漁倉庫，資料日期 2026/08/06）
+// 真實資料來源：OT庫存狀況表0813.xlsx（大漁倉庫，資料日期 2026/08/13）
 // ---------------------------------------------------------------------------
 const dayuInvSummary = {
-  reportDate: "2026/08/06",
-  totalQty: 782646.9,
-  totalCost: 89707032,
-  totalItems: 737,
+  reportDate: "2026/08/13",
+  totalQty: 767856.3,
+  totalCost: 89373077,
+  totalItems: 730,
   expiredCost: 438972,
   expiredItems: 18,
-  nearExpiryCost: 1150455,
+  nearExpiryCost: 1099790,
   nearExpiryItems: 33,
 };
 
 const dayuInvByCategory = [
-  { name: "魚貨", qty: 579376.4, cost: 59996330, color: "#2E86FF" },
-  { name: "冷凍水產品", qty: 106599.8, cost: 19597680, color: "#5DA9E9" },
-  { name: "加工製品", qty: 27452.8, cost: 6576274, color: "#F2A93B" },
-  { name: "其他", qty: 58284.3, cost: 2963447, color: "#94A3B8" },
+  { name: "魚貨", qty: 571837.4, cost: 59643770, color: "#2E86FF" },
+  { name: "冷凍水產品", qty: 106567.0, cost: 19627909, color: "#5DA9E9" },
+  { name: "加工製品", qty: 27830.6, cost: 6801006, color: "#F2A93B" },
+  { name: "其他", qty: 53975.8, cost: 2793854, color: "#94A3B8" },
   { name: "冷凍肉品", qty: 315.6, cost: 393690, color: "#EF6461" },
-  { name: "調味食品", qty: 10603.0, cost: 177210, color: "#14B8A6" },
+  { name: "調味食品", qty: 7315.0, cost: 110448, color: "#14B8A6" },
   { name: "餌料", qty: 15.0, cost: 2400, color: "#8B6BF2" },
 ];
 
 const dayuInvByWarehouse = [
-  { name: "-35度冷凍庫", cost: 22059387 },
-  { name: "-50度冷凍庫", cost: 15936017 },
-  { name: "三角貿易", cost: 14459090 },
-  { name: "加工倉", cost: 10905162 },
+  { name: "三角貿易", cost: 27267691 },
+  { name: "-35度冷凍庫", cost: 20625356 },
+  { name: "在途倉", cost: 12982971 },
+  { name: "-50度冷凍庫", cost: 11064717 },
   { name: "隆發", cost: 6550979 },
-  { name: "在途倉", cost: 6142043 },
-  { name: "海和", cost: 4260277 },
-  { name: "大順冷凍", cost: 2549718 },
-  { name: "順昌冷凍", cost: 1253258 },
-  { name: "正洋", cost: 512444 },
+  { name: "海和", cost: 4256131 },
+  { name: "大順冷凍", cost: 2368807 },
+  { name: "加工倉", cost: 2312684 },
+  { name: "裕國", cost: 1046295 },
+  { name: "順昌冷凍", cost: 488676 },
 ];
 
-// 庫存金額依產品名稱（前10大，依存貨成本加總排序，全部庫存共234項產品）
+// 庫存金額依產品名稱（前10大，依存貨成本加總排序，全部庫存共233項產品）
 const dayuInvByProduct = [
   { name: "長鰭鮪10上", cost: 19394696 },
-  { name: "鬼頭刀5上", cost: 6657301 },
+  { name: "鬼頭刀5上", cost: 6660451 },
   { name: "韓國活鮑魚", cost: 5170982 },
   { name: "南方黑鮪40上", cost: 5085460 },
-  { name: "劍旗25上", cost: 4108891 },
+  { name: "劍旗25上", cost: 4357801 },
   { name: "挪威鯖魚400/600", cost: 4068523 },
   { name: "手釣黃肌WR 20公斤上", cost: 3044790 },
-  { name: "水鯊去肚10上", cost: 2651518 },
+  { name: "水鯊去肚10上", cost: 2658490 },
   { name: "三摺白帶魚", cost: 2637548 },
   { name: "生凍櫻花蝦", cost: 2465052 },
 ];
 
-// 過期品明細（逾期天數以報表日 2026/08/06 換算）
+// 過期品明細（逾期天數以報表日 2026/08/13 換算）
 const dayuExpiredItems = [
-  { name: "豬肉香腸", qty: 372, unit: "包", warehouse: "加工倉", expiry: "2024-02-15", overdueDays: 897, cost: 37434 },
-  { name: "牡蠣肉 2L", qty: 18, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2024-03-17", overdueDays: 866, cost: 8640 },
-  { name: "魷魚圈", qty: 9, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2025-02-15", overdueDays: 531, cost: 720 },
-  { name: "爆卵柳葉魚", qty: 295, unit: "盒", warehouse: "-35度冷凍庫", expiry: "2025-02-18", overdueDays: 528, cost: 21092 },
-  { name: "冰烤地瓜(500g)", qty: 130, unit: "盒", warehouse: "加工倉", expiry: "2025-03-29", overdueDays: 489, cost: 8450 },
-  { name: "魷魚刻花", qty: 9, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2025-06-03", overdueDays: 423, cost: 720 },
-  { name: "熟白蝦40/50", qty: 24, unit: "盒", warehouse: "-35度冷凍庫", expiry: "2025-06-15", overdueDays: 411, cost: 9600 },
-  { name: "日本A5和牛沙朗牛排(200g)", qty: 1, unit: "包", warehouse: "正洋", expiry: "2025-06-16", overdueDays: 410, cost: 485 },
-  { name: "熟白蝦20/30", qty: 53, unit: "盒", warehouse: "-35度冷凍庫", expiry: "2025-07-01", overdueDays: 395, cost: 27560 },
-  { name: "明太子醬", qty: 234, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-02-01", overdueDays: 180, cost: 93541 },
-  { name: "熟凍干貝", qty: 6, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-03-13", overdueDays: 140, cost: 3960 },
-  { name: "甜蝦90/120", qty: 431, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-03-19", overdueDays: 134, cost: 118525 },
-  { name: "鮪魚碎肉", qty: 494.96, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-04-19", overdueDays: 103, cost: 44662 },
-  { name: "半殼扇貝", qty: 440, unit: "包", warehouse: "-35度冷凍庫", expiry: "2026-04-27", overdueDays: 95, cost: 33000 },
-  { name: "半殼扇貝", qty: 67.58, unit: "包", warehouse: "-35度冷凍庫", expiry: "2026-04-27", overdueDays: 95, cost: 11147 },
-  { name: "和牛肋眼A5", qty: 3, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-05-27", overdueDays: 65, cost: 8400 },
-  { name: "熟章魚腳 7P", qty: 5, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-05-31", overdueDays: 61, cost: 3000 },
-  { name: "和牛肋眼A5", qty: 2.87, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-06-02", overdueDays: 59, cost: 8036 },
+  { name: "豬肉香腸", qty: 372, unit: "包", warehouse: "加工倉", expiry: "2024-02-15", overdueDays: 910, cost: 37434 },
+  { name: "牡蠣肉 2L", qty: 18, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2024-03-17", overdueDays: 879, cost: 8640 },
+  { name: "魷魚圈", qty: 9, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2025-02-15", overdueDays: 544, cost: 720 },
+  { name: "爆卵柳葉魚", qty: 295, unit: "盒", warehouse: "-35度冷凍庫", expiry: "2025-02-18", overdueDays: 541, cost: 21092 },
+  { name: "冰烤地瓜(500g)", qty: 130, unit: "盒", warehouse: "加工倉", expiry: "2025-03-29", overdueDays: 502, cost: 8450 },
+  { name: "魷魚刻花", qty: 9, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2025-06-03", overdueDays: 436, cost: 720 },
+  { name: "熟白蝦40/50", qty: 24, unit: "盒", warehouse: "-35度冷凍庫", expiry: "2025-06-15", overdueDays: 424, cost: 9600 },
+  { name: "日本A5和牛沙朗牛排(200g)", qty: 1, unit: "包", warehouse: "正洋", expiry: "2025-06-16", overdueDays: 423, cost: 485 },
+  { name: "熟白蝦20/30", qty: 53, unit: "盒", warehouse: "-35度冷凍庫", expiry: "2025-07-01", overdueDays: 408, cost: 27560 },
+  { name: "明太子醬", qty: 234, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-02-01", overdueDays: 193, cost: 93541 },
+  { name: "熟凍干貝", qty: 6, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-03-13", overdueDays: 153, cost: 3960 },
+  { name: "甜蝦90/120", qty: 431, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-03-19", overdueDays: 147, cost: 118525 },
+  { name: "鮪魚碎肉", qty: 494.96, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-04-19", overdueDays: 116, cost: 44662 },
+  { name: "半殼扇貝", qty: 440, unit: "包", warehouse: "-35度冷凍庫", expiry: "2026-04-27", overdueDays: 108, cost: 33000 },
+  { name: "半殼扇貝", qty: 67.58, unit: "包", warehouse: "-35度冷凍庫", expiry: "2026-04-27", overdueDays: 108, cost: 11147 },
+  { name: "和牛肋眼A5", qty: 3, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-05-27", overdueDays: 78, cost: 8400 },
+  { name: "熟章魚腳 7P", qty: 5, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-05-31", overdueDays: 74, cost: 3000 },
+  { name: "和牛肋眼A5", qty: 2.87, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-06-02", overdueDays: 72, cost: 8036 },
 ];
 
 // 即將到期明細（依剩餘天數排序，含四級警示）
 const dayuNearExpiryItems = [
-  { name: "海菜吻仔魚湯料盒", qty: 22, unit: "盒", warehouse: "正洋", expiry: "2026-09-09", daysLeft: 34, level: "警示", cost: 1430 },
-  { name: "黑鮪大腹肉", qty: 0.29, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-09-30", daysLeft: 55, level: "警示", cost: 303 },
-  { name: "黃肌STEAK", qty: 980, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-10", daysLeft: 65, level: "警示", cost: 119149 },
-  { name: "鮪魚黑肉", qty: 1390, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-10", daysLeft: 65, level: "警示", cost: 44473 },
-  { name: "冷凍去殼帶尾甜蝦150g", qty: 17, unit: "包", warehouse: "正洋", expiry: "2026-10-17", daysLeft: 72, level: "警示", cost: 3060 },
-  { name: "鮭魚6/7", qty: 19.4, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-18", daysLeft: 73, level: "警示", cost: 5807 },
-  { name: "黃肌LOIN", qty: 737, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-19", daysLeft: 74, level: "警示", cost: 89605 },
-  { name: "劍旗碎肉", qty: 120, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-19", daysLeft: 74, level: "警示", cost: 9982 },
-  { name: "旗魚碎肉", qty: 575, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-19", daysLeft: 74, level: "警示", cost: 19412 },
-  { name: "臭肉魚絲(沙丁魚干)", qty: 2, unit: "包", warehouse: "正洋", expiry: "2026-10-22", daysLeft: 77, level: "警示", cost: 104 },
-  { name: "黑鮪大腹肉", qty: 84.97, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-31", daysLeft: 86, level: "警示", cost: 82956 },
-  { name: "黑輪片", qty: 65, unit: "包", warehouse: "正洋", expiry: "2026-10-31", daysLeft: 86, level: "警示", cost: 4307 },
-  { name: "魚鬆捲心酥", qty: 6913, unit: "隻", warehouse: "正洋", expiry: "2026-11-12", daysLeft: 98, level: "注意", cost: 48948 },
-  { name: "白鯧900/1000", qty: 47.29, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-11-13", daysLeft: 99, level: "注意", cost: 46344 },
-  { name: "生凍櫻花蝦", qty: 905, unit: "公斤", warehouse: "海和", expiry: "2026-11-13", daysLeft: 99, level: "注意", cost: 357209 },
-  { name: "生凍櫻花蝦", qty: 124.5, unit: "公斤", warehouse: "海和", expiry: "2026-11-17", daysLeft: 103, level: "注意", cost: 50315 },
-  { name: "生凍櫻花蝦", qty: 0.01, unit: "公斤", warehouse: "海和", expiry: "2026-11-27", daysLeft: 113, level: "注意", cost: 4 },
-  { name: "大比目魚切片35P", qty: 1.6, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-11-30", daysLeft: 116, level: "注意", cost: 706 },
-  { name: "火燒蝦仁(包)", qty: 1, unit: "包", warehouse: "正洋", expiry: "2026-12-01", daysLeft: 117, level: "注意", cost: 85 },
-  { name: "土魠切片(澎湖手釣)", qty: 1, unit: "包", warehouse: "正洋", expiry: "2026-12-01", daysLeft: 117, level: "注意", cost: 200 },
-  { name: "圓鱈10/15", qty: 25.9, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-12-10", daysLeft: 126, level: "注意", cost: 37555 },
-  { name: "圓鱈10/15", qty: 40.85, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-12-10", daysLeft: 126, level: "注意", cost: 59232 },
-  { name: "圓鱈", qty: 29.07, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-12-11", daysLeft: 127, level: "注意", cost: 40696 },
-  { name: "圓鱈10/15", qty: 1.3, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-12-11", daysLeft: 127, level: "注意", cost: 1885 },
-  { name: "圓鱈", qty: 24.05, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-12-12", daysLeft: 128, level: "注意", cost: 33670 },
-  { name: "圓鱈10/15", qty: 11.05, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-12-12", daysLeft: 128, level: "注意", cost: 18233 },
-  { name: "鮭魚碎肉", qty: 15, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-12-16", daysLeft: 132, level: "注意", cost: 3000 },
-  { name: "生凍櫻花蝦", qty: 2.67, unit: "公斤", warehouse: "海和", expiry: "2026-12-18", daysLeft: 134, level: "注意", cost: 1302 },
-  { name: "圓鱈15/20", qty: 17.14, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2027-01-07", daysLeft: 154, level: "注意", cost: 23139 },
-  { name: "生凍櫻花蝦", qty: 5.1, unit: "公斤", warehouse: "海和", expiry: "2027-01-22", daysLeft: 169, level: "注意", cost: 2318 },
-  { name: "熟白蝦30/40", qty: 1, unit: "盒", warehouse: "-35度冷凍庫", expiry: "2027-01-24", daysLeft: 171, level: "注意", cost: 430 },
-  { name: "魷魚一夜干(280G 上)", qty: 214, unit: "尾", warehouse: "-35度冷凍庫", expiry: "2027-02-03", daysLeft: 181, level: "追蹤", cost: 18190 },
-  { name: "生凍櫻花蝦", qty: 55.91, unit: "公斤", warehouse: "海和", expiry: "2027-02-09", daysLeft: 187, level: "追蹤", cost: 26406 },
+  { name: "海菜吻仔魚湯料盒", qty: 19, unit: "盒", warehouse: "正洋", expiry: "2026-09-09", daysLeft: 27, level: "緊急", cost: 1235 },
+  { name: "黑鮪大腹肉", qty: 0.29, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-09-30", daysLeft: 48, level: "警示", cost: 303 },
+  { name: "黃肌STEAK", qty: 980, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-10", daysLeft: 58, level: "警示", cost: 119149 },
+  { name: "鮪魚黑肉", qty: 1390, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-10", daysLeft: 58, level: "警示", cost: 44473 },
+  { name: "冷凍去殼帶尾甜蝦150g", qty: 17, unit: "包", warehouse: "正洋", expiry: "2026-10-17", daysLeft: 65, level: "警示", cost: 3060 },
+  { name: "鮭魚6/7", qty: 19.4, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-18", daysLeft: 66, level: "警示", cost: 5807 },
+  { name: "黃肌LOIN", qty: 737, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-19", daysLeft: 67, level: "警示", cost: 89605 },
+  { name: "劍旗碎肉", qty: 120, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-19", daysLeft: 67, level: "警示", cost: 9982 },
+  { name: "旗魚碎肉", qty: 575, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-19", daysLeft: 67, level: "警示", cost: 19412 },
+  { name: "臭肉魚絲(沙丁魚干)", qty: 2, unit: "包", warehouse: "正洋", expiry: "2026-10-22", daysLeft: 70, level: "警示", cost: 104 },
+  { name: "黑輪片", qty: 65, unit: "包", warehouse: "正洋", expiry: "2026-10-31", daysLeft: 79, level: "警示", cost: 4307 },
+  { name: "黑鮪大腹肉", qty: 49.97, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-10-31", daysLeft: 79, level: "警示", cost: 48786 },
+  { name: "魚鬆捲心酥", qty: 5159, unit: "隻", warehouse: "正洋", expiry: "2026-11-12", daysLeft: 91, level: "注意", cost: 36529 },
+  { name: "白鯧900/1000", qty: 47.29, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-11-13", daysLeft: 92, level: "注意", cost: 46344 },
+  { name: "生凍櫻花蝦", qty: 905, unit: "公斤", warehouse: "海和", expiry: "2026-11-13", daysLeft: 92, level: "注意", cost: 357209 },
+  { name: "生凍櫻花蝦", qty: 124.5, unit: "公斤", warehouse: "海和", expiry: "2026-11-17", daysLeft: 96, level: "注意", cost: 50315 },
+  { name: "生凍櫻花蝦", qty: 0.01, unit: "公斤", warehouse: "海和", expiry: "2026-11-27", daysLeft: 106, level: "注意", cost: 4 },
+  { name: "大比目魚切片35P", qty: 1.6, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-11-30", daysLeft: 109, level: "注意", cost: 706 },
+  { name: "土魠切片(澎湖手釣)", qty: 1, unit: "包", warehouse: "正洋", expiry: "2026-12-01", daysLeft: 110, level: "注意", cost: 200 },
+  { name: "火燒蝦仁(包)", qty: 1, unit: "包", warehouse: "正洋", expiry: "2026-12-01", daysLeft: 110, level: "注意", cost: 85 },
+  { name: "圓鱈10/15", qty: 25.9, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-12-10", daysLeft: 119, level: "注意", cost: 37555 },
+  { name: "圓鱈10/15", qty: 40.85, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-12-10", daysLeft: 119, level: "注意", cost: 59232 },
+  { name: "圓鱈10/15", qty: 1.3, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-12-11", daysLeft: 120, level: "注意", cost: 1885 },
+  { name: "圓鱈", qty: 29.07, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-12-11", daysLeft: 120, level: "注意", cost: 40696 },
+  { name: "圓鱈10/15", qty: 11.05, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-12-12", daysLeft: 121, level: "注意", cost: 18233 },
+  { name: "圓鱈", qty: 24.05, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-12-12", daysLeft: 121, level: "注意", cost: 33670 },
+  { name: "鮭魚碎肉", qty: 7.5, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2026-12-16", daysLeft: 125, level: "注意", cost: 1500 },
+  { name: "生凍櫻花蝦", qty: 2.67, unit: "公斤", warehouse: "海和", expiry: "2026-12-18", daysLeft: 127, level: "注意", cost: 1302 },
+  { name: "圓鱈15/20", qty: 17.14, unit: "公斤", warehouse: "-35度冷凍庫", expiry: "2027-01-07", daysLeft: 147, level: "注意", cost: 23139 },
+  { name: "生凍櫻花蝦", qty: 5.1, unit: "公斤", warehouse: "海和", expiry: "2027-01-22", daysLeft: 162, level: "注意", cost: 2318 },
+  { name: "熟白蝦30/40", qty: 1, unit: "盒", warehouse: "-35度冷凍庫", expiry: "2027-01-24", daysLeft: 164, level: "注意", cost: 430 },
+  { name: "魷魚一夜干(280G 上)", qty: 186, unit: "尾", warehouse: "-35度冷凍庫", expiry: "2027-02-03", daysLeft: 174, level: "注意", cost: 15810 },
+  { name: "生凍櫻花蝦", qty: 55.91, unit: "公斤", warehouse: "海和", expiry: "2027-02-09", daysLeft: 180, level: "注意", cost: 26406 },
 ];
 
 const EXPIRY_LEVEL_COLOR = {
@@ -571,24 +568,25 @@ const EXPIRY_LEVEL_COLOR = {
 };
 
 // ---------------------------------------------------------------------------
-// 真實資料來源：豐展漁業＿2026/7/20-7/26 大西洋漁撈預估收入（週報，船務庫存）
+// 真實資料來源：豐展漁業＿2026/8/3-8/9 大西洋漁撈預估收入（週報，船務庫存）
 // ---------------------------------------------------------------------------
 const shippingInvWeek = {
-  period: "2026/07/20 – 2026/07/26",
+  period: "2026/08/03 – 2026/08/09",
   vessels: [
-    { name: "滿帆-1", days: 6, catchKg: 12232, cryoJPY: 645507, swordUSD: 1786.34, acrUSD: 36862.65 },
-    { name: "滿帆-168", days: 6, catchKg: 16743, cryoJPY: 547040, swordUSD: 650.57, acrUSD: 52389.44 },
-    { name: "滿福-188", days: 3, catchKg: 6493, cryoJPY: 447455, swordUSD: 0, acrUSD: 19820.74 },
-    { name: "滿福-666", days: 1, catchKg: 1638, cryoJPY: 209350, swordUSD: 791.95, acrUSD: 4218.85 },
-    { name: "宏洋輪", days: 0, catchKg: 0, cryoJPY: 0, swordUSD: 0, acrUSD: 0 },
-    { name: "宏洋輪1號", days: 2, catchKg: 4699, cryoJPY: 196106, swordUSD: 99.88, acrUSD: 14684.32 },
+    { name: "滿帆-1", days: 7, catchKg: 18480, cryoJPY: 161472, swordUSD: 520.34, acrUSD: 59458.94 },
+    { name: "滿帆-168", days: 7, catchKg: 17880, cryoJPY: 662421, swordUSD: 0, acrUSD: 56098.88 },
+    { name: "滿福-188", days: 7, catchKg: 21371, cryoJPY: 530587, swordUSD: 329.99, acrUSD: 67788.87 },
+    { name: "滿福-666", days: 6, catchKg: 12769, cryoJPY: 871446, swordUSD: 1245.64, acrUSD: 37871.65 },
+    { name: "宏洋輪", days: 7, catchKg: 13199, cryoJPY: 207770, swordUSD: 839.58, acrUSD: 41937.02 },
+    { name: "宏洋輪1號", days: 5, catchKg: 12192, cryoJPY: 304598, swordUSD: 893.17, acrUSD: 38221.04 },
   ],
-  total: { catchKg: 37308, cryoJPY: 2045459, swordUSD: 3328.75, acrUSD: 127975.99 },
+  total: { catchKg: 71343, cryoJPY: 2738293, swordUSD: 3828.73, acrUSD: 301376.4 },
 };
 
 // ---------------------------------------------------------------------------
-// 真實資料來源：0810-貿易資金.xlsx／0810-船務資金.xlsx（資金狀況表，2026/08/10）
-// 115_8_10.xlsx（集團借款總表）
+// 真實資料來源：0813-貿易資金.xlsx／0813-船務資金.xlsx（資金狀況表，2026/08/13）
+// ※ 兩份原始檔案內容與檔名相反（依內容部門標籤比對後校正）
+// 115_8_11.xlsx（集團借款總表）
 // ---------------------------------------------------------------------------
 function addCash(a, b) {
   return {
@@ -602,14 +600,14 @@ function addCash(a, b) {
 
 const cashByDept = {
   trade: {
-    TWD: { prev: 28669548, inflow: 1019384, outflow: 796695, restricted: 19011150, balance: 9881087 },
-    USD: { prev: 1717219.4, inflow: 0, outflow: 204903.86, restricted: 1050353.49, balance: 461962.05 },
-    JPY: { prev: 146261170, inflow: 0, outflow: 0, restricted: 71007646, balance: 75253524 },
+    TWD: { prev: 33796456, inflow: 2803740, outflow: 2406745, restricted: 19011150, balance: 15182301 },
+    USD: { prev: 1715973.23, inflow: 100000.0, outflow: 15312.81, restricted: 1050353.49, balance: 750306.93 },
+    JPY: { prev: 165171832, inflow: 0, outflow: 0, restricted: 71007646, balance: 94164186 },
   },
   shipping: {
-    TWD: { prev: 9958263, inflow: 2078000, outflow: 2056939, restricted: 4227682, balance: 5751642 },
-    USD: { prev: 312849.21, inflow: 200000.0, outflow: 5557.03, restricted: 171377.98, balance: 335914.2 },
-    JPY: { prev: 402568721, inflow: 0, outflow: 0, restricted: 349920071, balance: 52648650 },
+    TWD: { prev: 9258309, inflow: 200000, outflow: 762479, restricted: 3045178, balance: 5650652 },
+    USD: { prev: 593651.52, inflow: 441842.58, outflow: 262444.34, restricted: 171377.98, balance: 601671.78 },
+    JPY: { prev: 351505715, inflow: 0, outflow: 0, restricted: 349920071, balance: 1585644 },
   },
 };
 
@@ -621,12 +619,12 @@ const cashGroup = {
 
 const loanTotals = {
   shipping: { TWD: 140063945, USD: 9714364.71, JPY: 0, EUR: 30000 },
-  trade: { TWD: 589320584, USD: 7410426.7, JPY: 81724301, EUR: 0 },
-  group: { TWD: 729384529, USD: 17124791.41, JPY: 81724301, EUR: 30000 },
+  trade: { TWD: 589320584, USD: 7463800.3, JPY: 81724301, EUR: 0 },
+  group: { TWD: 729384529, USD: 17178165.01, JPY: 81724301, EUR: 30000 },
 };
 
 const loanByYear = [
-  { year: "2026", TWD: 323546660, USD: 15753726.41 },
+  { year: "2026", TWD: 323546660, USD: 15807100.01 },
   { year: "2027", TWD: 62577927, USD: 1371065.0 },
   { year: "2028", TWD: 8802480, USD: 0 },
   { year: "2029", TWD: 15798765, USD: 0 },
@@ -636,7 +634,7 @@ const loanByYear = [
 ];
 
 const loanByBank = [
-  { name: "中國信託", TWD: 190000000, USD: 1314357.27 },
+  { name: "中國信託", TWD: 190000000, USD: 1367730.87 },
   { name: "華南銀行/博愛", TWD: 123844752, USD: 2808537.5 },
   { name: "元大銀行", TWD: 88730611, USD: 3833975.75 },
   { name: "第一銀行", TWD: 68380407, USD: 900000 },
@@ -656,7 +654,7 @@ const loanByBank = [
 
 const creditLine = {
   TWD: { total: 625000000, used: 414574587, available: 210425413 },
-  USD: { total: 19300000, used: 17675887.43, available: 1624112.57 },
+  USD: { total: 19300000, used: 17729261.03, available: 1570738.97 },
 };
 
 // ---------------------------------------------------------------------------
@@ -1686,7 +1684,7 @@ function DayuInventory() {
       <div className="period-bar">
         <Warehouse size={16} />
         <span>
-          大漁庫存・資料日期 {dayuInvSummary.reportDate}　（資料來源：OT庫存狀況表20260806.xlsx，每週四更新）
+          大漁庫存・資料日期 {dayuInvSummary.reportDate}　（資料來源：OT庫存狀況表0813.xlsx，每週四更新）
         </span>
       </div>
 
@@ -2390,7 +2388,7 @@ function FinancePage() {
       {/* ---------- 區塊一：資金狀況 ---------- */}
       <div className="period-bar">
         <CircleDollarSign size={16} />
-        <span>資金狀況・2026/08/10　（資料來源：0810-貿易資金.xlsx ＋ 0810-船務資金.xlsx，貿易＋船務合計）</span>
+        <span>資金狀況・2026/08/13　（資料來源：0813-貿易資金.xlsx ＋ 0813-船務資金.xlsx，貿易＋船務合計）</span>
       </div>
 
       <div className="chart-row">
@@ -2443,7 +2441,7 @@ function FinancePage() {
       {/* ---------- 區塊二：借款總表 ---------- */}
       <div className="period-bar" style={{ marginTop: 6 }}>
         <Landmark size={16} />
-        <span>借款總表・截至 2026/08/10　（資料來源：115_8_10.xlsx）</span>
+        <span>借款總表・截至 2026/08/11　（資料來源：115_8_11.xlsx）</span>
       </div>
 
 
@@ -2663,7 +2661,7 @@ function HomePage({ onNavigate }) {
       {/* ---------- 區塊一：現金水位 ---------- */}
       <div className="period-bar">
         <CircleDollarSign size={16} />
-        <span>現金水位・2026/08/10　（資料來源：貿易＋船務資金狀況表）</span>
+        <span>現金水位・2026/08/13　（資料來源：貿易＋船務資金狀況表）</span>
       </div>
       <div className="flex-card-row">
         <CashAvailableCard title="集團資金水位" />
@@ -2760,194 +2758,6 @@ const INVENTORY_TABS = [
   { key: "shipping", label: "船務庫存" },
 ];
 
-// ---------------------------------------------------------------------------
-// 一頁式報告：彙整集團損益／資金／借款／庫存重點，供列印或匯出 PDF
-// ---------------------------------------------------------------------------
-function ReportPage({ onBack }) {
-  const genTime = new Date().toLocaleString("zh-TW", { hour12: false });
-  const groupRevenue = tradeCumulative.revenue + dayuCumulative.revenue + fleetTotal.revenue;
-  const groupGrossProfit = tradeCumulative.grossProfit + dayuCumulative.grossProfit + fleetTotal.grossProfit;
-  const groupPretax = tradeCumulative.pretax + dayuCumulative.pretax + fleetTotal.currentPeriodProfit;
-
-  return (
-    <div className="report-screen">
-      <div className="report-toolbar no-print">
-        <button className="report-back-btn" onClick={onBack}>
-          <ArrowLeft size={15} />
-          返回儀表板
-        </button>
-        <button className="report-print-btn" onClick={() => window.print()}>
-          <Printer size={15} />
-          列印／匯出 PDF
-        </button>
-      </div>
-
-      <div className="report-page">
-        <div className="report-header">
-          <div>
-            <div className="report-title">Ocean King Group</div>
-            <div className="report-subtitle">集團經營管理一頁式報告</div>
-          </div>
-          <div className="report-meta">
-            <div>報告產生時間：{genTime}</div>
-            <div>單位：新台幣元（TWD），另有 USD／JPY 標註處除外</div>
-          </div>
-        </div>
-
-        <div className="report-grid">
-          <div className="report-section">
-            <div className="report-section-title">集團損益（2026年1–6月累計）</div>
-            <table className="report-table">
-              <thead>
-                <tr>
-                  <th className="left">事業群</th>
-                  <th>營業收入</th>
-                  <th>營業毛利</th>
-                  <th>稅前／最終損益</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="left">貿易</td>
-                  <td>{fmtWan(tradeCumulative.revenue)}</td>
-                  <td>{fmtWan(tradeCumulative.grossProfit)}</td>
-                  <td className={tradeCumulative.pretax < 0 ? "neg" : "pos"}>{fmtWan(tradeCumulative.pretax)}</td>
-                </tr>
-                <tr>
-                  <td className="left">大漁</td>
-                  <td>{fmtWan(dayuCumulative.revenue)}</td>
-                  <td>{fmtWan(dayuCumulative.grossProfit)}</td>
-                  <td className={dayuCumulative.pretax < 0 ? "neg" : "pos"}>{fmtWan(dayuCumulative.pretax)}</td>
-                </tr>
-                <tr>
-                  <td className="left">船務（最終損益）</td>
-                  <td>{fmtWan(fleetTotal.revenue)}</td>
-                  <td>{fmtWan(fleetTotal.grossProfit)}</td>
-                  <td className={fleetTotal.currentPeriodProfit < 0 ? "neg" : "pos"}>{fmtWan(fleetTotal.currentPeriodProfit)}</td>
-                </tr>
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td className="left">集團合計</td>
-                  <td>{fmtWan(groupRevenue)}</td>
-                  <td>{fmtWan(groupGrossProfit)}</td>
-                  <td className={groupPretax < 0 ? "neg" : "pos"}>{fmtWan(groupPretax)}</td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-
-          <div className="report-section">
-            <div className="report-section-title">集團資金水位（2026/08/10）</div>
-            <table className="report-table">
-              <thead>
-                <tr>
-                  <th className="left">幣別</th>
-                  <th>可動用餘額</th>
-                  <th>不可動用</th>
-                </tr>
-              </thead>
-              <tbody>
-                {["TWD", "USD", "JPY"].map((cur) => (
-                  <tr key={cur}>
-                    <td className="left">{cur}</td>
-                    <td className="pos">{fmtWan(cashGroup[cur].balance)}</td>
-                    <td className="neg">{fmtWan(cashGroup[cur].restricted)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="report-section">
-            <div className="report-section-title">借款總表（截至 2026/08/10）</div>
-            <table className="report-table">
-              <thead>
-                <tr>
-                  <th className="left">幣別</th>
-                  <th>借款總額</th>
-                  <th>剩餘可用額度</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="left">TWD</td>
-                  <td>{fmtWan(loanTotals.group.TWD)}</td>
-                  <td>{fmtWan(creditLine.TWD.available)}</td>
-                </tr>
-                <tr>
-                  <td className="left">USD</td>
-                  <td>{fmtWan(loanTotals.group.USD)}</td>
-                  <td>{fmtWan(creditLine.USD.available)}</td>
-                </tr>
-                <tr>
-                  <td className="left">JPY</td>
-                  <td>{fmtWan(loanTotals.group.JPY)}</td>
-                  <td>—</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div className="report-section">
-            <div className="report-section-title">庫存重點</div>
-            <table className="report-table">
-              <thead>
-                <tr>
-                  <th className="left">項目</th>
-                  <th>筆數／數量</th>
-                  <th>金額</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="left">大漁庫存總額（{dayuInvSummary.reportDate}）</td>
-                  <td>{dayuInvSummary.totalItems} 筆</td>
-                  <td>{fmtWan(dayuInvSummary.totalCost)}</td>
-                </tr>
-                <tr>
-                  <td className="left">大漁過期品</td>
-                  <td>{dayuInvSummary.expiredItems} 筆</td>
-                  <td className="neg">{fmtWan(dayuInvSummary.expiredCost)}</td>
-                </tr>
-                <tr>
-                  <td className="left">大漁即將到期</td>
-                  <td>{dayuInvSummary.nearExpiryItems} 筆</td>
-                  <td className="neg">{fmtWan(dayuInvSummary.nearExpiryCost)}</td>
-                </tr>
-                <tr>
-                  <td className="left">船務週漁獲量（{shippingInvWeek.period}）</td>
-                  <td>{fmt(shippingInvWeek.total.catchKg)} 公斤</td>
-                  <td>—</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div className="report-section report-highlights">
-          <div className="report-section-title">重點提醒</div>
-          <ul>
-            <li>
-              USD 授信額度已使用 {pct(creditLine.USD.used, creditLine.USD.total)}%，剩餘可用額度僅 {fmt(creditLine.USD.available)} USD，建議近期美金付款前先確認調度來源。
-            </li>
-            <li>
-              大漁庫存有 {dayuInvSummary.expiredItems} 筆商品已過期（{fmtWan(dayuInvSummary.expiredCost)} 元），另有 {dayuInvSummary.nearExpiryItems} 筆將於 6 個月內到期，建議優先處理最接近到期的品項。
-            </li>
-            <li>
-              船務最終損益（累計，含預估收入不含折舊）為 {fmtWan(fleetTotal.currentPeriodProfit)}，貿易累計稅前損益 {fmtWan(tradeCumulative.pretax)}，大漁累計稅前損益 {fmtWan(dayuCumulative.pretax)}。
-            </li>
-          </ul>
-        </div>
-
-        <div className="report-footer">
-          本報告由集團經營管理儀表板自動彙整現有資料產生，僅供內部參考，正式決策請以各部門覆核數字為準。
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function Dashboard() {
   const [nav, setNav] = useState("home");
   const [pnlTab, setPnlTab] = useState("consolidated");
@@ -2989,17 +2799,11 @@ function Dashboard() {
               </button>
             );
           })}
-          <button className="topnav-item topnav-report-btn" onClick={() => setNav("report")}>
-            <FileText size={15} />
-            產生報告
-          </button>
         </nav>
       </header>
 
       <main className="main">
-        {nav === "report" ? (
-          <ReportPage onBack={() => setNav("home")} />
-        ) : nav === "home" ? (
+        {nav === "home" ? (
           <HomePage onNavigate={handleNavigate} />
         ) : nav === "finance" ? (
           <FinancePage />
@@ -3630,65 +3434,4 @@ tfoot td.left{text-align:left;font-family:inherit;}
   transition:transform 0.15s,background 0.15s;
 }
 .logout-btn:hover{background:rgba(8,20,40,1);transform:translateY(-1px);}
-.topnav-report-btn{
-  margin-left:auto;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.16) !important;
-}
-.report-screen{min-height:100vh;background:var(--bg);padding:20px;}
-.report-toolbar{
-  max-width:820px;margin:0 auto 14px;display:flex;justify-content:space-between;gap:10px;
-}
-.report-back-btn,.report-print-btn{
-  display:flex;align-items:center;gap:6px;border-radius:9px;padding:9px 16px;font-size:13px;
-  font-weight:600;cursor:pointer;font-family:inherit;border:1px solid var(--border);
-}
-.report-back-btn{background:#fff;color:var(--text);}
-.report-back-btn:hover{border-color:#BFD6EE;}
-.report-print-btn{background:linear-gradient(135deg,#2E86FF,#22D3EE);color:#fff;border:none;
-  box-shadow:0 8px 20px -8px rgba(46,134,255,0.5);}
-.report-print-btn:hover{transform:translateY(-1px);}
-.report-page{
-  max-width:820px;margin:0 auto;background:#fff;border-radius:14px;border:1px solid var(--border);
-  padding:32px 36px;box-shadow:0 1px 2px rgba(16,24,40,0.04),0 12px 28px -18px rgba(16,24,40,0.20);
-}
-.report-header{
-  display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
-  border-bottom:2px solid var(--navy);padding-bottom:14px;margin-bottom:20px;
-}
-.report-title{font-family:var(--display);font-weight:700;font-size:22px;color:var(--navy);}
-.report-subtitle{font-size:13px;color:var(--muted);margin-top:2px;}
-.report-meta{font-size:11px;color:var(--muted);text-align:right;line-height:1.7;}
-.report-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
-@media(max-width:640px){.report-grid{grid-template-columns:1fr;}}
-.report-section{margin-bottom:18px;}
-.report-section-title{
-  font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px;
-  padding-bottom:4px;border-bottom:1px solid var(--border);
-}
-.report-table{width:100%;border-collapse:collapse;font-size:11.5px;}
-.report-table th{
-  text-align:right;color:var(--muted);font-weight:600;padding:5px 6px;
-  border-bottom:1px solid var(--border);font-size:10.5px;
-}
-.report-table th.left{text-align:left;}
-.report-table td{
-  text-align:right;padding:6px;font-family:var(--mono);border-bottom:1px solid #F1F5F9;color:var(--text);
-}
-.report-table td.left{text-align:left;font-family:inherit;}
-.report-table tfoot td{font-weight:700;border-top:1.5px solid var(--text);border-bottom:none;}
-.report-highlights ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;}
-.report-highlights li{font-size:11.5px;line-height:1.6;color:var(--text);}
-.report-footer{
-  margin-top:16px;padding-top:12px;border-top:1px dashed var(--border);
-  font-size:10.5px;color:var(--muted);text-align:center;
-}
-@media print{
-  .no-print{display:none !important;}
-  .topbar{display:none !important;}
-  .logout-btn{display:none !important;}
-  .report-screen{background:#fff;padding:0;}
-  .report-page{
-    max-width:100%;border:none;box-shadow:none;border-radius:0;padding:0;margin:0;
-  }
-  @page{size:A4;margin:14mm;}
-}
 `;
