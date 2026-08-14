@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, createContext, useContext } from "react";
 import {
   ResponsiveContainer,
   PieChart,
@@ -56,6 +56,9 @@ const BROADCAST_CONFIG = {
   // 你的 GitHub Pages 網址，會放進 LINE 訊息卡片的「查看完整儀表板」按鈕連結
   dashboardUrl: "https://irene88888.github.io/OK_system/",
 };
+
+// 推播按鈕權限：只有用「通行碼三」登入時才看得到各頁面的 LINE 推播按鈕
+const CanBroadcastContext = createContext(false);
 
 // 推播按鈕：呼叫 Cloudflare Worker，轉發訊息給 LINE 官方帳號所有好友
 function BroadcastButton({ label, buildPayload }) {
@@ -1688,23 +1691,25 @@ function DayuInventory() {
         </span>
       </div>
 
-      <BroadcastButton
-        label="發送大漁庫存週報推播"
-        buildPayload={() => ({
-          type: "weekly_inventory",
-          data: {
-            title: "大漁庫存週報",
-            weekLabel: dayuInvSummary.reportDate + " 更新",
-            metrics: [
-              { label: "庫存總數量", value: fmt(dayuInvSummary.totalQty) + " (公斤/件)" },
-              { label: "庫存總金額", value: "NT$ " + fmtWan(dayuInvSummary.totalCost) },
-              { label: "過期品金額", value: "NT$ " + fmtWan(dayuInvSummary.expiredCost) + "（" + dayuInvSummary.expiredItems + " 筆）" },
-              { label: "即將到期金額", value: "NT$ " + fmtWan(dayuInvSummary.nearExpiryCost) + "（" + dayuInvSummary.nearExpiryItems + " 筆）" },
-            ],
-            dashboardUrl: BROADCAST_CONFIG.dashboardUrl,
-          },
-        })}
-      />
+      {useContext(CanBroadcastContext) && (
+        <BroadcastButton
+          label="發送大漁庫存週報推播"
+          buildPayload={() => ({
+            type: "weekly_inventory",
+            data: {
+              title: "大漁庫存週報",
+              weekLabel: dayuInvSummary.reportDate + " 更新",
+              metrics: [
+                { label: "庫存總數量", value: fmt(dayuInvSummary.totalQty) + " (公斤/件)" },
+                { label: "庫存總金額", value: "NT$ " + fmtWan(dayuInvSummary.totalCost) },
+                { label: "過期品金額", value: "NT$ " + fmtWan(dayuInvSummary.expiredCost) + "（" + dayuInvSummary.expiredItems + " 筆）" },
+                { label: "即將到期金額", value: "NT$ " + fmtWan(dayuInvSummary.nearExpiryCost) + "（" + dayuInvSummary.nearExpiryItems + " 筆）" },
+              ],
+              dashboardUrl: BROADCAST_CONFIG.dashboardUrl,
+            },
+          })}
+        />
+      )}
 
       <div className="kpi-grid">
         <KpiCard
@@ -1974,23 +1979,25 @@ function ShippingInventory() {
         </span>
       </div>
 
-      <BroadcastButton
-        label="發送船務庫存週報推播"
-        buildPayload={() => ({
-          type: "weekly_inventory",
-          data: {
-            title: "船務庫存週報",
-            weekLabel: shippingInvWeek.period,
-            metrics: [
-              { label: "本週總漁獲量", value: fmt(shippingInvWeek.total.catchKg) + " 公斤" },
-              { label: "ACR 預估收入", value: "US$ " + fmtWan(shippingInvWeek.total.acrUSD) },
-              { label: "超低溫預估收入", value: "¥ " + fmtWan(shippingInvWeek.total.cryoJPY) },
-              { label: "劍旗預估收入", value: "US$ " + fmtWan(shippingInvWeek.total.swordUSD) },
-            ],
-            dashboardUrl: BROADCAST_CONFIG.dashboardUrl,
-          },
-        })}
-      />
+      {useContext(CanBroadcastContext) && (
+        <BroadcastButton
+          label="發送船務庫存週報推播"
+          buildPayload={() => ({
+            type: "weekly_inventory",
+            data: {
+              title: "船務庫存週報",
+              weekLabel: shippingInvWeek.period,
+              metrics: [
+                { label: "本週總漁獲量", value: fmt(shippingInvWeek.total.catchKg) + " 公斤" },
+                { label: "ACR 預估收入", value: "US$ " + fmtWan(shippingInvWeek.total.acrUSD) },
+                { label: "超低溫預估收入", value: "¥ " + fmtWan(shippingInvWeek.total.cryoJPY) },
+                { label: "劍旗預估收入", value: "US$ " + fmtWan(shippingInvWeek.total.swordUSD) },
+              ],
+              dashboardUrl: BROADCAST_CONFIG.dashboardUrl,
+            },
+          })}
+        />
+      )}
 
       <div className="kpi-grid">
         <KpiCard
@@ -2396,19 +2403,21 @@ function FinancePage() {
         <NetCashFlowCard />
       </div>
 
-      <BroadcastButton
-        label="發送每日現金水位推播"
-        buildPayload={() => ({
-          type: "daily_cash",
-          data: {
-            date: new Date().toLocaleDateString("zh-TW"),
-            twd: "NT$ " + fmtWan(cashGroup.TWD.balance),
-            usd: "US$ " + fmtWan(cashGroup.USD.balance),
-            jpy: "¥ " + fmtWan(cashGroup.JPY.balance),
-            dashboardUrl: BROADCAST_CONFIG.dashboardUrl,
-          },
-        })}
-      />
+      {useContext(CanBroadcastContext) && (
+        <BroadcastButton
+          label="發送每日現金水位推播"
+          buildPayload={() => ({
+            type: "daily_cash",
+            data: {
+              date: new Date().toLocaleDateString("zh-TW"),
+              twd: "NT$ " + fmtWan(cashGroup.TWD.balance),
+              usd: "US$ " + fmtWan(cashGroup.USD.balance),
+              jpy: "¥ " + fmtWan(cashGroup.JPY.balance),
+              dashboardUrl: BROADCAST_CONFIG.dashboardUrl,
+            },
+          })}
+        />
+      )}
 
       <div className="panel">
         <div className="panel-title">各幣別資金可動用比例</div>
@@ -2900,7 +2909,9 @@ function Dashboard() {
 
 // ---------------------------------------------------------------------------
 // 登入保護（前端簡易密碼驗證）
-// 三組密碼各自獨立、看到的內容完全相同，方便個別管理／停用單一組密碼。
+// 三組密碼各自獨立、看到的內容大致相同，方便個別管理／停用單一組密碼；
+// 唯一差別是只有「通行碼三」登入時，才會在資金／庫存頁面看到 LINE 推播按鈕
+// （其他兩組密碼登入後看得到全部資料，但不會出現推播按鈕，避免誤按）。
 // 密碼不是明文存在程式碼裡，而是存 SHA-256 雜湊值；要換密碼／停用某一組，
 // 只要把對應的雜湊值換掉或刪掉即可，換法請見下方 sha256Hex 的說明。
 // 注意：這只是前端層級的簡易防護（防君子不防小人），不是真正安全的後端驗證。
@@ -2912,6 +2923,9 @@ const PASSWORD_HASHES = [
 ];
 
 const AUTH_STORAGE_KEY = "ok_group_dashboard_auth_v1";
+const BROADCAST_STORAGE_KEY = "ok_group_dashboard_broadcast_v1";
+// 三組密碼中，只有「通行碼三」登入時才會看到 LINE 推播按鈕
+const BROADCAST_HASH_INDEX = 2;
 
 // 把輸入的密碼算成 SHA-256 雜湊值（十六進位字串），拿去跟 PASSWORD_HASHES 比對。
 // 如果要換新密碼：打開瀏覽器 Console，貼上以下程式碼算出新雜湊值，
@@ -2933,6 +2947,13 @@ function LoginGate() {
       return false;
     }
   });
+  const [canBroadcast, setCanBroadcast] = useState(() => {
+    try {
+      return localStorage.getItem(BROADCAST_STORAGE_KEY) === "1";
+    } catch (e) {
+      return false;
+    }
+  });
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [checking, setChecking] = useState(false);
@@ -2943,12 +2964,16 @@ function LoginGate() {
     setError("");
     try {
       const hash = await sha256Hex(password);
-      if (PASSWORD_HASHES.includes(hash)) {
+      const matchedIndex = PASSWORD_HASHES.indexOf(hash);
+      if (matchedIndex !== -1) {
+        const canBroadcastNow = matchedIndex === BROADCAST_HASH_INDEX;
         try {
           localStorage.setItem(AUTH_STORAGE_KEY, "1");
+          localStorage.setItem(BROADCAST_STORAGE_KEY, canBroadcastNow ? "1" : "0");
         } catch (e) {
           /* localStorage 不可用時仍允許本次瀏覽通過 */
         }
+        setCanBroadcast(canBroadcastNow);
         setAuthed(true);
       } else {
         setError("密碼不正確，請再確認一次。");
@@ -2961,22 +2986,26 @@ function LoginGate() {
   const handleLogout = () => {
     try {
       localStorage.removeItem(AUTH_STORAGE_KEY);
+      localStorage.removeItem(BROADCAST_STORAGE_KEY);
     } catch (e) {
       /* ignore */
     }
     setAuthed(false);
+    setCanBroadcast(false);
     setPassword("");
   };
 
   if (authed) {
     return (
-      <div style={{ position: "relative" }}>
-        <Dashboard />
-        <button className="logout-btn" onClick={handleLogout}>
-          <LogOut size={13} />
-          登出
-        </button>
-      </div>
+      <CanBroadcastContext.Provider value={canBroadcast}>
+        <div style={{ position: "relative" }}>
+          <Dashboard />
+          <button className="logout-btn" onClick={handleLogout}>
+            <LogOut size={13} />
+            登出
+          </button>
+        </div>
+      </CanBroadcastContext.Provider>
     );
   }
 
